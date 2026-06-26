@@ -872,15 +872,13 @@ Devuelve SOLO JSON sin texto adicional ni markdown:
 - mealPlan: ${D.meals} comidas adaptadas a su dieta y alergias`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://msmwaldktlrxhxvarepj.supabase.co/functions/v1/generate-plan', {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':'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',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbXdhbGRrdGxyeGh4dmFyZXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzQwNzcsImV4cCI6MjA5NzU1MDA3N30.Lpr8P9SsTG_7i_iPORqu2gt9pffpnvaZ_oqx5wsCQwI'
       },
-      body: JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+      body: JSON.stringify({ prompt })
     });
     const json = await res.json();
     const text = json.content[0].text;
