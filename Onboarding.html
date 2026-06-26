@@ -167,7 +167,25 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
     <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;margin-bottom:16px">EMPIEZA DESDE CERO</div>
     <div style="color:var(--text);font-size:15px;line-height:1.7">Tu plan de gym completamente personalizado. Generado por IA. Solo para ti.</div>
   </div>
-  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s1')">Empezar</button></div></div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s-login')">Empezar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S-LOGIN: CUENTA
+═══════════════════════════════════════════ -->
+<div class="screen" id="s-login">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 28px 140px;max-width:480px;margin:0 auto;width:100%">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:40px">REPZERO</div>
+    <div id="login-title" style="font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;margin-bottom:8px">CREA TU CUENTA</div>
+    <div id="login-sub" style="color:var(--text);font-size:14px;margin-bottom:36px;line-height:1.6">Guarda tu plan y accede desde cualquier dispositivo.</div>
+    <div class="fields">
+      <div><label class="field-lbl">Email</label><input type="text" id="l-email" placeholder="tu@email.com" inputmode="email"></div>
+      <div><label class="field-lbl">Contrasena</label><input type="password" id="l-pass" placeholder="Minimo 6 caracteres"></div>
+    </div>
+    <div id="login-error" style="color:#ff4444;font-size:13px;margin-top:12px;display:none"></div>
+    <div style="margin-top:24px;text-align:center;color:var(--text);font-size:13px">Ya tienes cuenta? <span onclick="toggleLogin()" style="color:var(--white);cursor:pointer;font-weight:700;text-decoration:underline" id="login-toggle">Entrar</span></div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" id="login-btn" onclick="handleLogin()">Crear cuenta y continuar</button></div></div>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -883,10 +901,68 @@ Devuelve SOLO JSON sin texto adicional ni markdown:
 
 function delay(ms) { return new Promise(r => setTimeout(r,ms)); }
 
-// Check session
-supabase.auth.getSession().then(({data:{session}}) => {
-  if (!session) window.location.href = 'login.html';
+// Check session — if already logged in and has profile go home
+supabase.auth.getSession().then(async ({data:{session}}) => {
+  if (session) {
+    const { data: profile } = await supabase.from('repzero_profiles').select('id').eq('user_id', session.user.id).single();
+    if (profile) { window.location.href = 'home.html'; return; }
+    go('s1'); // logged in but no profile — skip login
+  }
 });
+
+let isLoginMode = false;
+
+window.toggleLogin = function() {
+  isLoginMode = !isLoginMode;
+  document.getElementById('login-title').textContent = isLoginMode ? 'BIENVENIDO' : 'CREA TU CUENTA';
+  document.getElementById('login-sub').textContent = isLoginMode ? 'Entra a tu cuenta para ver tu plan.' : 'Guarda tu plan y accede desde cualquier dispositivo.';
+  document.getElementById('login-btn').textContent = isLoginMode ? 'Entrar' : 'Crear cuenta y continuar';
+  document.getElementById('login-toggle').textContent = isLoginMode ? 'Crear cuenta' : 'Entrar';
+  document.getElementById('login-error').style.display = 'none';
+};
+
+window.handleLogin = async function() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+
+  if (!email || !pass) { err.textContent = 'Rellena todos los campos.'; err.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Cargando...';
+  err.style.display = 'none';
+
+  try {
+    let result;
+    if (isLoginMode) {
+      result = await supabase.auth.signInWithPassword({ email, password: pass });
+    } else {
+      result = await supabase.auth.signUp({ email, password: pass });
+    }
+
+    if (result.error) {
+      err.textContent = result.error.message;
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = isLoginMode ? 'Entrar' : 'Crear cuenta y continuar';
+      return;
+    }
+
+    // If login, check if profile exists
+    if (isLoginMode && result.data.user) {
+      const { data: profile } = await supabase.from('repzero_profiles').select('id').eq('user_id', result.data.user.id).single();
+      if (profile) { window.location.href = 'home.html'; return; }
+    }
+
+    go('s1');
+  } catch(e) {
+    err.textContent = 'Error de conexion. Intenta de nuevo.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = isLoginMode ? 'Entrar' : 'Crear cuenta y continuar';
+  }
+};
 </script>
 </body>
 </html>
