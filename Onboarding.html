@@ -62,7 +62,7 @@ html,body { height:100%; overflow:hidden; background:var(--black); color:var(--w
 /* INPUTS */
 .fields { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
 .field-lbl { color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; display:block; }
-input[type=text],input[type=number] { width:100%; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; padding:18px 20px; color:var(--white); font-size:16px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.15s; }
+input[type=text],input[type=number],input[type=password],input[type=email] { width:100%; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; padding:18px 20px; color:var(--white); font-size:16px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.15s; -webkit-appearance:none; appearance:none; }
 input:focus { border-color:var(--white); }
 input::placeholder { color:var(--text); }
 
@@ -163,7 +163,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
 ═══════════════════════════════════════════ -->
 <div class="screen active" id="s0">
   <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:48px 28px 140px;max-width:480px;margin:0 auto;width:100%">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:48px;color:var(--text)">REPZERO</div>
+    <img src="logo.png" style="width:52px;height:52px;object-fit:contain;filter:invert(1);margin-bottom:48px" alt="RepZero">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;margin-bottom:16px">EMPIEZA DESDE CERO</div>
     <div style="color:var(--text);font-size:15px;line-height:1.7">Tu plan de gym completamente personalizado. Generado por IA. Solo para ti.</div>
   </div>
@@ -175,7 +175,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s-login">
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 28px 140px;max-width:480px;margin:0 auto;width:100%">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:40px">REPZERO</div>
+    <img src="logo.png" style="width:44px;height:44px;object-fit:contain;filter:invert(1);margin-bottom:40px;display:block" alt="RepZero">
     <div id="login-title" style="font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;margin-bottom:8px">CREA TU CUENTA</div>
     <div id="login-sub" style="color:var(--text);font-size:14px;margin-bottom:36px;line-height:1.6">Guarda tu plan y accede desde cualquier dispositivo.</div>
     <div class="fields">
@@ -192,7 +192,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S1: DATOS PERSONALES
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s1">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:6%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 1 de 17</div>
@@ -212,7 +212,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S2: SEXO
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s2">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:12%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 2 de 17</div>
@@ -234,7 +234,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S3: OBJETIVO PRINCIPAL
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s3">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:18%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 3 de 17</div>
@@ -266,7 +266,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S4: OBJETIVOS ADICIONALES
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s4">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:24%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 4 de 17</div>
@@ -337,7 +337,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S5: NIVEL
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s5">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:30%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 5 de 17</div>
@@ -369,7 +369,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S6: HAS DEJADO EL GYM
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s6">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:36%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 6 de 17</div>
@@ -397,7 +397,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S7: DIAS POR SEMANA
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s7">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:42%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 7 de 17</div>
@@ -429,7 +429,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S8: TIEMPO POR SESION (SLIDER)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s8">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:48%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 8 de 17</div>
@@ -448,7 +448,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S9: HORA DE ENTRENAR
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s9">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:54%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 9 de 17</div>
@@ -519,7 +519,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S10: PARTES DEL CUERPO
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s10">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 10 de 17</div>
@@ -543,7 +543,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S11: LESIONES
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s11">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:66%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 11 de 17</div>
@@ -579,7 +579,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S12: SUENO
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s12">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:72%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 12 de 17</div>
@@ -611,7 +611,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S13: DIETA
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s13">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:78%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 13 de 17</div>
@@ -647,7 +647,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S14: ALERGIAS
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s14">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:84%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 14 de 17</div>
@@ -671,7 +671,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S15: COMIDAS AL DIA (SCROLL PICKER)
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s15">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:90%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 15 de 17</div>
@@ -697,7 +697,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
      S16: DONDE NOS CONOCISTE
 ═══════════════════════════════════════════ -->
 <div class="screen" id="s16">
-  <div class="logo-top">REPZERO</div>
+  <div class="logo-top"><img src="logo.png" style="width:32px;height:32px;object-fit:contain;filter:invert(1);vertical-align:middle" alt="RepZero"></div>
   <div class="progress"><div class="progress-fill" style="width:96%"></div></div>
   <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
     <div class="step-lbl">Paso 16 de 17</div>
@@ -735,7 +735,7 @@ input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--
 <div class="screen" id="s17">
   <div style="flex:1;display:flex;flex-direction:column;">
     <div class="gen-center">
-      <div class="gen-logo">REPZERO</div>
+      <img src="logo.png" style="width:52px;height:52px;object-fit:contain;filter:invert(1);margin-bottom:8px" alt="RepZero">
       <div class="gen-title">La IA esta analizando tus datos<br>y creando tu plan exacto.</div>
       <div class="gen-steps">
         <div class="gen-step" id="gs1"><div class="s-dot"></div><div class="s-txt">Analizando tu perfil fisico</div></div>
@@ -872,10 +872,15 @@ Devuelve SOLO JSON sin texto adicional ni markdown:
 - mealPlan: ${D.meals} comidas adaptadas a su dieta y alergias`;
 
   try {
-    const res = await fetch('/.netlify/functions/generate-plan', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ prompt })
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':'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',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body: JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:prompt}]})
     });
     const json = await res.json();
     const text = json.content[0].text;
