@@ -4,481 +4,889 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RepZero</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --black: #000; --white: #fff; --grey-dark: #111; --grey-line: #2a2a2a; --grey-text: #666; }
-  body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; min-height: 100vh; }
-  .screen { display: none; min-height: 100vh; flex-direction: column; }
-  .screen.active { display: flex; }
-  .wrap { max-width: 480px; margin: 0 auto; padding: 48px 28px; width: 100%; flex: 1; display: flex; flex-direction: column; }
-  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--grey-text); margin-bottom: 48px; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root { --black:#000; --white:#fff; --dark:#111; --line:#222; --text:#555; }
+html,body { height:100%; overflow:hidden; background:var(--black); color:var(--white); font-family:'Inter',sans-serif; }
 
-  /* Progress */
-  .progress-bar { height: 2px; background: var(--grey-line); margin-bottom: 48px; border-radius: 2px; }
-  .progress-fill { height: 100%; background: var(--white); border-radius: 2px; transition: width 0.4s ease; }
-  .step-label { color: var(--grey-text); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-  .question { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; margin-bottom: 8px; }
-  .sub { color: var(--grey-text); font-size: 14px; margin-bottom: 40px; line-height: 1.5; }
-  .spacer { flex: 1; }
+/* SCREENS */
+.screen { position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity 0.35s ease; overflow-y:auto; }
+.screen.active { opacity:1; pointer-events:all; }
 
-  /* Inputs */
-  .field { margin-bottom: 16px; }
-  .field-label { color: var(--grey-text); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
-  input[type="text"], input[type="number"] { width: 100%; background: var(--grey-dark); border: 1px solid var(--grey-line); border-radius: 4px; padding: 18px 20px; color: var(--white); font-size: 16px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; }
-  input:focus { border-color: var(--white); }
-  input::placeholder { color: var(--grey-text); }
+/* SHARED */
+.wrap { max-width:480px; margin:0 auto; padding:0 28px; width:100%; }
+.logo-top { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:var(--text); padding:20px 28px 0; max-width:480px; margin:0 auto; width:100%; flex-shrink:0; }
+.progress { height:2px; background:var(--line); margin:16px 28px 0; max-width:424px; margin-left:auto; margin-right:auto; border-radius:2px; flex-shrink:0; }
+.progress-fill { height:100%; background:var(--white); border-radius:2px; transition:width 0.5s ease; }
+.step-lbl { color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-top:20px; }
+.big-q { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; margin-top:10px; }
+.sub-q { color:var(--text); font-size:14px; line-height:1.6; margin-top:8px; }
+.content { flex:1; padding-bottom:120px; }
+.spacer { flex:1; }
 
-  /* Options */
-  .options { display: flex; flex-direction: column; gap: 8px; }
-  .option { padding: 18px 20px; background: var(--grey-dark); border: 1px solid var(--grey-line); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s; gap: 16px; }
-  .option:hover { border-color: #444; }
-  .option.selected { background: var(--white); border-color: var(--white); }
-  .option.selected .opt-name { color: var(--black); }
-  .option.selected .opt-desc { color: #555; }
-  .option.selected .opt-stat { color: #333; }
-  .option.selected .dot { border-color: var(--black); }
-  .option.selected .dot::after { opacity: 1; background: var(--black); }
-  .opt-left { flex: 1; }
-  .opt-name { color: var(--white); font-size: 15px; font-weight: 600; }
-  .opt-desc { color: var(--grey-text); font-size: 12px; margin-top: 2px; }
-  .opt-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .opt-stat { color: var(--grey-text); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .dot { width: 20px; height: 20px; border: 1.5px solid var(--grey-line); border-radius: 50%; position: relative; flex-shrink: 0; }
-  .dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 8px; height: 8px; border-radius: 50%; opacity: 0; transition: opacity 0.15s; }
+/* BOTTOM FIXED BTN */
+.btn-wrap { position:fixed; bottom:0; left:0; right:0; padding:20px 28px 36px; background:linear-gradient(transparent, #000 40%); z-index:99; }
+.btn-wrap .wrap { padding:0; }
+.btn { width:100%; background:var(--white); color:var(--black); border:none; padding:20px; font-size:15px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; border-radius:6px; font-family:'Inter',sans-serif; transition:opacity 0.2s; }
+.btn:hover { opacity:0.85; }
+.btn-ghost { width:100%; background:transparent; color:var(--text); border:none; padding:14px; font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; cursor:pointer; font-family:'Inter',sans-serif; margin-top:8px; }
 
-  /* Stat bar under option */
-  .stat-bar-wrap { margin-top: 6px; height: 2px; background: var(--grey-line); border-radius: 2px; overflow: hidden; }
-  .stat-bar-fill { height: 100%; background: var(--grey-text); border-radius: 2px; transition: width 0.6s ease; }
-  .option.selected .stat-bar-fill { background: #333; }
+/* OPTIONS */
+.opts { display:flex; flex-direction:column; gap:8px; margin-top:28px; }
+.opt { padding:18px 20px; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; transition:all 0.15s; user-select:none; }
+.opt:active { transform:scale(0.98); }
+.opt.sel { background:var(--white); border-color:var(--white); }
+.opt.sel .opt-name { color:var(--black); }
+.opt.sel .opt-desc { color:#444; }
+.opt.sel .opt-stat { color:#333; }
+.opt.sel .dot { border-color:var(--black); }
+.opt.sel .dot::after { opacity:1; background:var(--black); }
+.opt-name { color:var(--white); font-size:15px; font-weight:700; }
+.opt-desc { color:var(--text); font-size:12px; margin-top:2px; }
+.opt-l { flex:1; }
+.opt-r { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.opt-stat { color:var(--text); font-size:11px; font-weight:700; letter-spacing:0.5px; }
+.dot { width:22px; height:22px; border:1.5px solid var(--line); border-radius:50%; position:relative; flex-shrink:0; }
+.dot::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:10px; height:10px; border-radius:50%; opacity:0; transition:opacity 0.15s; }
+.bar { height:2px; background:var(--line); border-radius:2px; margin-top:8px; }
+.bar-fill { height:100%; background:var(--text); border-radius:2px; }
+.opt.sel .bar-fill { background:#333; }
 
-  /* Button */
-  .btn { margin-top: 32px; width: 100%; background: var(--white); color: var(--black); border: none; padding: 18px; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 4px; font-family: 'Inter', sans-serif; transition: opacity 0.2s; }
-  .btn:hover { opacity: 0.85; }
-  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+/* MULTI SELECT */
+.multi-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:28px; }
+.chip { padding:14px 18px; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; color:var(--white); transition:all 0.15s; user-select:none; }
+.chip:active { transform:scale(0.96); }
+.chip.sel { background:var(--white); color:var(--black); border-color:var(--white); }
 
-  /* Generating screen */
-  .gen-wrap { max-width: 480px; margin: 0 auto; padding: 48px 28px; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  .gen-title { font-family: 'Bebas Neue', sans-serif; font-size: 48px; margin-bottom: 16px; }
-  .gen-sub { color: var(--grey-text); font-size: 14px; line-height: 1.7; margin-bottom: 48px; }
-  .gen-steps { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 16px; }
-  .gen-step { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--grey-dark); border: 1px solid var(--grey-line); border-radius: 4px; transition: all 0.3s; }
-  .gen-step.done { border-color: var(--white); }
-  .gen-step.done .step-dot { background: var(--white); }
-  .gen-step.done .step-text { color: var(--white); }
-  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grey-line); flex-shrink: 0; transition: background 0.3s; }
-  .step-text { font-size: 13px; font-weight: 600; color: var(--grey-text); letter-spacing: 0.5px; }
+/* INPUTS */
+.fields { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
+.field-lbl { color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; display:block; }
+input[type=text],input[type=number] { width:100%; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; padding:18px 20px; color:var(--white); font-size:16px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.15s; }
+input:focus { border-color:var(--white); }
+input::placeholder { color:var(--text); }
+
+/* GENDER */
+.gender-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:28px; }
+.gender-card { padding:24px 20px; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; cursor:pointer; text-align:center; transition:all 0.15s; }
+.gender-card:active { transform:scale(0.97); }
+.gender-card.sel { background:var(--white); border-color:var(--white); }
+.gender-card.sel .g-name { color:var(--black); }
+.gender-icon { font-size:32px; margin-bottom:10px; }
+.g-name { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--white); }
+
+/* SLIDER */
+.slider-wrap { margin-top:40px; }
+.slider-val { font-family:'Bebas Neue',sans-serif; font-size:80px; text-align:center; line-height:1; }
+.slider-unit { color:var(--text); font-size:16px; font-weight:600; letter-spacing:1px; text-transform:uppercase; text-align:center; margin-top:4px; }
+input[type=range] { width:100%; margin-top:32px; -webkit-appearance:none; appearance:none; height:2px; background:var(--line); border-radius:2px; outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:28px; height:28px; background:var(--white); border-radius:50%; cursor:pointer; }
+input[type=range]::-moz-range-thumb { width:28px; height:28px; background:var(--white); border-radius:50%; cursor:pointer; border:none; }
+
+/* TIME PICKER */
+.time-opts { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:28px; }
+.time-opt { padding:18px 10px; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; cursor:pointer; text-align:center; transition:all 0.15s; }
+.time-opt.sel { background:var(--white); border-color:var(--white); }
+.time-opt.sel .t-name { color:var(--black); }
+.time-opt.sel .t-icon { color:var(--black); }
+.t-icon { font-size:24px; margin-bottom:8px; }
+.t-name { font-size:13px; font-weight:700; color:var(--white); }
+
+/* IMPACT SCREENS */
+.impact { background:var(--black); min-height:100%; display:flex; flex-direction:column; }
+.impact-hero { padding:48px 28px 0; max-width:480px; margin:0 auto; width:100%; }
+.impact-tag { display:inline-block; border:1px solid var(--line); color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:6px 12px; border-radius:3px; margin-bottom:20px; }
+.impact-title { font-family:'Bebas Neue',sans-serif; font-size:56px; line-height:1; }
+.impact-title span { color:var(--text); }
+.impact-sub { color:var(--text); font-size:15px; line-height:1.6; margin-top:12px; }
+
+/* CHART */
+.chart-wrap { margin:32px 28px 0; max-width:424px; margin-left:auto; margin-right:auto; background:var(--dark); border:1px solid var(--line); border-radius:8px; padding:24px; }
+.chart-legend { display:flex; gap:20px; margin-bottom:20px; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); letter-spacing:0.5px; }
+.legend-dot { width:10px; height:10px; border-radius:50%; }
+.chart-svg { width:100%; height:160px; }
+.chart-labels { display:flex; justify-content:space-between; margin-top:8px; }
+.chart-label { font-size:10px; color:var(--text); font-weight:600; letter-spacing:0.5px; }
+
+/* STATS ROW */
+.stats-impact { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:16px 28px 0; max-width:424px; margin-left:auto; margin-right:auto; }
+.stat-impact { background:var(--dark); border:1px solid var(--line); border-radius:6px; padding:20px; }
+.stat-impact-val { font-family:'Bebas Neue',sans-serif; font-size:40px; }
+.stat-impact-lbl { color:var(--text); font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+
+/* GENERATING */
+.gen-center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 28px; text-align:center; max-width:480px; margin:0 auto; width:100%; }
+.gen-logo { font-family:'Bebas Neue',sans-serif; font-size:48px; letter-spacing:3px; margin-bottom:8px; }
+.gen-title { font-size:15px; color:var(--text); line-height:1.6; margin-bottom:48px; }
+.gen-steps { width:100%; display:flex; flex-direction:column; gap:10px; }
+.gen-step { display:flex; align-items:center; gap:16px; padding:16px 20px; background:var(--dark); border:1px solid var(--line); border-radius:6px; transition:all 0.4s; }
+.gen-step.done { border-color:var(--white); }
+.gen-step.done .s-dot { background:var(--white); }
+.gen-step.done .s-txt { color:var(--white); }
+.s-dot { width:8px; height:8px; border-radius:50%; background:var(--line); flex-shrink:0; transition:background 0.4s; }
+.s-txt { font-size:13px; font-weight:600; color:var(--text); }
+
+/* SCROLL PICKER */
+.pick-wrap { margin-top:32px; position:relative; height:200px; overflow:hidden; }
+.pick-list { display:flex; flex-direction:column; align-items:center; gap:0; cursor:grab; }
+.pick-item { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--text); padding:16px 0; transition:all 0.2s; user-select:none; width:100%; text-align:center; }
+.pick-item.active { font-size:56px; color:var(--white); }
+.pick-line-top,.pick-line-bot { position:absolute; left:28px; right:28px; height:1px; background:var(--line); pointer-events:none; }
+.pick-line-top { top:68px; }
+.pick-line-bot { bottom:68px; }
+
+/* BODY PARTS */
+.body-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:28px; }
+.body-opt { padding:18px; background:var(--dark); border:1.5px solid var(--line); border-radius:6px; cursor:pointer; transition:all 0.15s; }
+.body-opt.sel { background:var(--white); border-color:var(--white); }
+.body-opt.sel .b-name { color:var(--black); }
+.b-name { color:var(--white); font-size:14px; font-weight:700; }
+.b-desc { color:var(--text); font-size:11px; margin-top:2px; }
+.body-opt.sel .b-desc { color:#444; }
+
+/* INJURY */
+.inj-opts { display:flex; flex-direction:column; gap:8px; margin-top:28px; }
+
+/* BACK BTN */
+.back-btn { position:fixed; top:20px; left:20px; z-index:100; width:40px; height:40px; background:var(--dark); border:1px solid var(--line); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--white); transition:opacity 0.2s; }
+.back-btn:hover { opacity:0.7; }
 </style>
 </head>
 <body>
 
-<!-- S1: Datos personales -->
-<div class="screen active" id="s1">
-  <div class="wrap">
-    <div class="logo">REPZERO</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:16%"></div></div>
-    <div class="step-label">Paso 1 de 6</div>
-    <div class="question">CUENTANOS SOBRE TI</div>
-    <div class="sub">Solo lo basico. Tu plan se construye con esto.</div>
-    <div class="field">
-      <label class="field-label">Tu nombre</label>
-      <input type="text" id="inp-name" placeholder="Alejandro">
-    </div>
-    <div class="field">
-      <label class="field-label">Edad</label>
-      <input type="number" id="inp-age" placeholder="16" min="10" max="80">
-    </div>
-    <div class="field">
-      <label class="field-label">Peso (kg)</label>
-      <input type="number" id="inp-weight" placeholder="70" min="30" max="250">
-    </div>
-    <div class="field">
-      <label class="field-label">Altura (cm)</label>
-      <input type="number" id="inp-height" placeholder="175" min="100" max="250">
-    </div>
-    <div class="spacer"></div>
-    <button class="btn" onclick="goS2()">Continuar</button>
+<!-- BACK BTN (hidden on first screens) -->
+<div class="back-btn" id="back-btn" style="display:none" onclick="goBack()">‹</div>
+
+<!-- ═══════════════════════════════════════════
+     S0: WELCOME
+═══════════════════════════════════════════ -->
+<div class="screen active" id="s0">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:48px 28px 140px;max-width:480px;margin:0 auto;width:100%">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:48px;color:var(--text)">REPZERO</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;margin-bottom:16px">EMPIEZA DESDE CERO</div>
+    <div style="color:var(--text);font-size:15px;line-height:1.7">Tu plan de gym completamente personalizado. Generado por IA. Solo para ti.</div>
   </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s1')">Empezar</button></div></div>
 </div>
 
-<!-- S2: Objetivo -->
+<!-- ═══════════════════════════════════════════
+     S1: DATOS PERSONALES
+═══════════════════════════════════════════ -->
+<div class="screen" id="s1">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:6%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 1 de 17</div>
+    <div class="big-q">CUENTANOS SOBRE TI</div>
+    <div class="sub-q">Solo lo basico. Tu plan empieza aqui.</div>
+    <div class="fields">
+      <div><label class="field-lbl">Tu nombre</label><input type="text" id="i-name" placeholder="Alejandro"></div>
+      <div><label class="field-lbl">Edad</label><input type="number" id="i-age" placeholder="16" min="10" max="80"></div>
+      <div><label class="field-lbl">Peso (kg)</label><input type="number" id="i-weight" placeholder="70" min="30" max="250"></div>
+      <div><label class="field-lbl">Altura (cm)</label><input type="number" id="i-height" placeholder="175" min="100" max="250"></div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="s1Next()">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S2: SEXO
+═══════════════════════════════════════════ -->
 <div class="screen" id="s2">
-  <div class="wrap">
-    <div class="logo">REPZERO</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
-    <div class="step-label">Paso 2 de 6</div>
-    <div class="question">CUAL ES TU OBJETIVO</div>
-    <div class="sub">Tu plan se construye alrededor de tu meta principal.</div>
-    <div class="options">
-      <div class="option" onclick="sel(this,'s2')">
-        <div class="opt-left">
-          <div class="opt-name">Ganar musculo</div>
-          <div class="opt-desc">Aumentar masa muscular y fuerza</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:62%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">62% eligen esto</div><div class="dot"></div></div>
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:12%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 2 de 17</div>
+    <div class="big-q">SEXO BIOLOGICO</div>
+    <div class="sub-q">Afecta al calculo de calorias y plan de entrenamiento.</div>
+    <div class="gender-row">
+      <div class="gender-card" onclick="selGender(this,'Hombre')">
+        <div class="g-name">HOMBRE</div>
       </div>
-      <div class="option" onclick="sel(this,'s2')">
-        <div class="opt-left">
-          <div class="opt-name">Perder peso</div>
-          <div class="opt-desc">Quemar grasa y definir</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:24%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">24% eligen esto</div><div class="dot"></div></div>
-      </div>
-      <div class="option" onclick="sel(this,'s2')">
-        <div class="opt-left">
-          <div class="opt-name">Mantener peso</div>
-          <div class="opt-desc">Mantenerte en forma y activo</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:9%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">9% eligen esto</div><div class="dot"></div></div>
-      </div>
-      <div class="option" onclick="sel(this,'s2')">
-        <div class="opt-left">
-          <div class="opt-name">Mejorar resistencia</div>
-          <div class="opt-desc">Mas energia y cardio</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:5%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">5% eligen esto</div><div class="dot"></div></div>
+      <div class="gender-card" onclick="selGender(this,'Mujer')">
+        <div class="g-name">MUJER</div>
       </div>
     </div>
-    <div class="spacer"></div>
-    <button class="btn" onclick="goS3()">Continuar</button>
   </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s3')">Continuar</button></div></div>
 </div>
 
-<!-- S3: Nivel -->
+<!-- ═══════════════════════════════════════════
+     S3: OBJETIVO PRINCIPAL
+═══════════════════════════════════════════ -->
 <div class="screen" id="s3">
-  <div class="wrap">
-    <div class="logo">REPZERO</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
-    <div class="step-label">Paso 3 de 6</div>
-    <div class="question">CUAL ES TU NIVEL</div>
-    <div class="sub">Se honesto. El plan se adapta exactamente a ti.</div>
-    <div class="options">
-      <div class="option" onclick="sel(this,'s3')">
-        <div class="opt-left">
-          <div class="opt-name">Nunca he ido al gym</div>
-          <div class="opt-desc">Empiezo desde cero absoluto</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:38%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">38% como tu</div><div class="dot"></div></div>
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:18%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 3 de 17</div>
+    <div class="big-q">CUAL ES TU OBJETIVO</div>
+    <div class="sub-q">Tu plan se construye alrededor de esto.</div>
+    <div class="opts">
+      <div class="opt" onclick="selOpt(this,'s3','goal')">
+        <div class="opt-l"><div class="opt-name">Ganar musculo</div><div class="opt-desc">Masa muscular y fuerza</div><div class="bar"><div class="bar-fill" style="width:62%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">62%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s3')">
-        <div class="opt-left">
-          <div class="opt-name">Principiante</div>
-          <div class="opt-desc">Menos de 6 meses de experiencia</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:35%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">35% como tu</div><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s3','goal')">
+        <div class="opt-l"><div class="opt-name">Perder peso</div><div class="opt-desc">Quemar grasa y definir</div><div class="bar"><div class="bar-fill" style="width:24%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">24%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s3')">
-        <div class="opt-left">
-          <div class="opt-name">Intermedio</div>
-          <div class="opt-desc">Entre 6 meses y 2 anos</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:20%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">20% como tu</div><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s3','goal')">
+        <div class="opt-l"><div class="opt-name">Mantener peso</div><div class="opt-desc">Forma y salud general</div><div class="bar"><div class="bar-fill" style="width:9%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">9%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s3')">
-        <div class="opt-left">
-          <div class="opt-name">Avanzado</div>
-          <div class="opt-desc">Mas de 2 anos entrenando</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:7%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">7% como tu</div><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s3','goal')">
+        <div class="opt-l"><div class="opt-name">Mejorar resistencia</div><div class="opt-desc">Cardio y energia</div><div class="bar"><div class="bar-fill" style="width:5%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">5%</div><div class="dot"></div></div>
       </div>
     </div>
-    <div class="spacer"></div>
-    <button class="btn" onclick="goS4()">Continuar</button>
   </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s4')">Continuar</button></div></div>
 </div>
 
-<!-- S4: Dias -->
+<!-- ═══════════════════════════════════════════
+     S4: OBJETIVOS ADICIONALES
+═══════════════════════════════════════════ -->
 <div class="screen" id="s4">
-  <div class="wrap">
-    <div class="logo">REPZERO</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:66%"></div></div>
-    <div class="step-label">Paso 4 de 6</div>
-    <div class="question">CUANTOS DIAS A LA SEMANA</div>
-    <div class="sub">Se realista. La constancia gana siempre.</div>
-    <div class="options">
-      <div class="option" onclick="sel(this,'s4')">
-        <div class="opt-left">
-          <div class="opt-name">2 dias</div>
-          <div class="opt-desc">Empezar con calma</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:15%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">15% eligen esto</div><div class="dot"></div></div>
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:24%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 4 de 17</div>
+    <div class="big-q">OBJETIVOS ADICIONALES</div>
+    <div class="sub-q">Selecciona todos los que quieras.</div>
+    <div class="multi-grid">
+      <div class="chip" onclick="this.classList.toggle('sel')">Mas energia</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Dormir mejor</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Reducir estres</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Mejorar postura</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Mas confianza</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Rendir en deporte</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Sentirme mejor</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Vida sana</div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="s4Next()">Continuar</button><button class="btn-ghost" onclick="go('s5')">Saltar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     IMPACT 1: REPZERO VS OTRAS APPS
+═══════════════════════════════════════════ -->
+<div class="screen" id="impact1">
+  <div class="impact">
+    <div class="impact-hero">
+      <div class="impact-tag">Datos reales</div>
+      <div class="impact-title">REPZERO DA RESULTADOS <span>DURADEROS</span></div>
+      <div class="impact-sub">Usuarios con plan personalizado por IA mantienen su progreso el doble de tiempo.</div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#fff"></div>RepZero</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#444;border:1px dashed #666"></div>Otras apps</div>
       </div>
-      <div class="option" onclick="sel(this,'s4')">
-        <div class="opt-left">
-          <div class="opt-name">3 dias</div>
-          <div class="opt-desc">Lo mas recomendado para principiantes</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:48%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">48% eligen esto</div><div class="dot"></div></div>
-      </div>
-      <div class="option" onclick="sel(this,'s4')">
-        <div class="opt-left">
-          <div class="opt-name">4 dias</div>
-          <div class="opt-desc">Para los que van en serio</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:28%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">28% eligen esto</div><div class="dot"></div></div>
-      </div>
-      <div class="option" onclick="sel(this,'s4')">
-        <div class="opt-left">
-          <div class="opt-name">5 dias</div>
-          <div class="opt-desc">Nivel avanzado</div>
-          <div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:9%"></div></div>
-        </div>
-        <div class="opt-right"><div class="opt-stat">9% eligen esto</div><div class="dot"></div></div>
+      <svg class="chart-svg" viewBox="0 0 320 160" preserveAspectRatio="none">
+        <!-- Grid lines -->
+        <line x1="0" y1="40" x2="320" y2="40" stroke="#222" stroke-width="1"/>
+        <line x1="0" y1="80" x2="320" y2="80" stroke="#222" stroke-width="1"/>
+        <line x1="0" y1="120" x2="320" y2="120" stroke="#222" stroke-width="1"/>
+        <!-- Other apps - goes down then back up (yo-yo) -->
+        <path d="M 20,40 C 80,40 80,130 160,110 C 220,95 260,120 300,100" stroke="#555" stroke-width="2" fill="none" stroke-dasharray="6,4"/>
+        <!-- RepZero - steady decline -->
+        <path d="M 20,60 C 80,70 140,90 200,105 C 240,115 280,125 300,130" stroke="#fff" stroke-width="2.5" fill="none"/>
+        <circle cx="300" cy="130" r="5" fill="#fff"/>
+        <circle cx="300" cy="100" r="5" fill="#555"/>
+        <!-- Labels -->
+        <text x="305" y="134" fill="#fff" font-size="10" font-family="Inter" font-weight="700">RZ</text>
+        <text x="305" y="104" fill="#555" font-size="10" font-family="Inter" font-weight="700">Otros</text>
+      </svg>
+      <div class="chart-labels">
+        <span class="chart-label">Semana 1</span>
+        <span class="chart-label">Mes 1</span>
+        <span class="chart-label">Mes 3</span>
+        <span class="chart-label">Mes 6</span>
       </div>
     </div>
-    <div class="spacer"></div>
-    <button class="btn" onclick="goS5()">Continuar</button>
+    <div class="stats-impact">
+      <div class="stat-impact"><div class="stat-impact-val">2.4x</div><div class="stat-impact-lbl">Mas resultados que otras apps</div></div>
+      <div class="stat-impact"><div class="stat-impact-val">87%</div><div class="stat-impact-lbl">Usuarios alcanzan su objetivo</div></div>
+    </div>
+    <div style="padding:0 28px;margin-top:auto;padding-bottom:36px;padding-top:24px;max-width:480px;margin-left:auto;margin-right:auto;width:100%">
+      <button class="btn" onclick="go('s5')">Continuar</button>
+    </div>
   </div>
 </div>
 
-<!-- S5: Donde nos conociste -->
+<!-- ═══════════════════════════════════════════
+     S5: NIVEL
+═══════════════════════════════════════════ -->
 <div class="screen" id="s5">
-  <div class="wrap">
-    <div class="logo">REPZERO</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:83%"></div></div>
-    <div class="step-label">Paso 5 de 6</div>
-    <div class="question">DONDE NOS CONOCISTE</div>
-    <div class="sub">Nos ayuda a saber donde estais vosotros.</div>
-    <div class="options">
-      <div class="option" onclick="sel(this,'s5')">
-        <div class="opt-left"><div class="opt-name">TikTok</div></div>
-        <div class="opt-right"><div class="dot"></div></div>
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:30%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 5 de 17</div>
+    <div class="big-q">CUAL ES TU NIVEL</div>
+    <div class="sub-q">Se honesto. El plan se adapta exactamente a ti.</div>
+    <div class="opts">
+      <div class="opt" onclick="selOpt(this,'s5','level')">
+        <div class="opt-l"><div class="opt-name">Nunca he ido al gym</div><div class="opt-desc">Empiezo desde cero absoluto</div><div class="bar"><div class="bar-fill" style="width:38%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">38%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s5')">
-        <div class="opt-left"><div class="opt-name">Instagram</div></div>
-        <div class="opt-right"><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s5','level')">
+        <div class="opt-l"><div class="opt-name">Principiante</div><div class="opt-desc">Menos de 6 meses</div><div class="bar"><div class="bar-fill" style="width:35%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">35%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s5')">
-        <div class="opt-left"><div class="opt-name">Google</div></div>
-        <div class="opt-right"><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s5','level')">
+        <div class="opt-l"><div class="opt-name">Intermedio</div><div class="opt-desc">Entre 6 meses y 2 anos</div><div class="bar"><div class="bar-fill" style="width:20%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">20%</div><div class="dot"></div></div>
       </div>
-      <div class="option" onclick="sel(this,'s5')">
-        <div class="opt-left"><div class="opt-name">Un amigo</div></div>
-        <div class="opt-right"><div class="dot"></div></div>
-      </div>
-      <div class="option" onclick="sel(this,'s5')">
-        <div class="opt-left"><div class="opt-name">Otro</div></div>
-        <div class="opt-right"><div class="dot"></div></div>
+      <div class="opt" onclick="selOpt(this,'s5','level')">
+        <div class="opt-l"><div class="opt-name">Avanzado</div><div class="opt-desc">Mas de 2 anos entrenando</div><div class="bar"><div class="bar-fill" style="width:7%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">7%</div><div class="dot"></div></div>
       </div>
     </div>
-    <div class="spacer"></div>
-    <button class="btn" onclick="generatePlan()">Generar mi plan</button>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s6')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S6: HAS DEJADO EL GYM
+═══════════════════════════════════════════ -->
+<div class="screen" id="s6">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:36%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 6 de 17</div>
+    <div class="big-q">HAS PROBADO EL GYM Y LO HAS DEJADO</div>
+    <div class="sub-q">No te preocupes. El 73% de nuestros usuarios tambien lo habian dejado antes.</div>
+    <div class="opts" style="margin-top:28px">
+      <div class="opt" onclick="selOpt(this,'s6','quit')">
+        <div class="opt-l"><div class="opt-name">Si, lo he dejado</div><div class="opt-desc">Empece pero no continue</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s6','quit')">
+        <div class="opt-l"><div class="opt-name">No, nunca he ido</div><div class="opt-desc">Es mi primera vez</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s6','quit')">
+        <div class="opt-l"><div class="opt-name">Sigo yendo</div><div class="opt-desc">Pero quiero mejorar</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s7')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S7: DIAS POR SEMANA
+═══════════════════════════════════════════ -->
+<div class="screen" id="s7">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:42%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 7 de 17</div>
+    <div class="big-q">CUANTOS DIAS A LA SEMANA</div>
+    <div class="sub-q">La constancia gana siempre. Se realista.</div>
+    <div class="opts">
+      <div class="opt" onclick="selOpt(this,'s7','days')">
+        <div class="opt-l"><div class="opt-name">2 dias</div><div class="opt-desc">Empezar con calma</div><div class="bar"><div class="bar-fill" style="width:15%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">15%</div><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s7','days')">
+        <div class="opt-l"><div class="opt-name">3 dias</div><div class="opt-desc">Lo mas recomendado</div><div class="bar"><div class="bar-fill" style="width:48%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">48%</div><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s7','days')">
+        <div class="opt-l"><div class="opt-name">4 dias</div><div class="opt-desc">Para los que van en serio</div><div class="bar"><div class="bar-fill" style="width:28%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">28%</div><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s7','days')">
+        <div class="opt-l"><div class="opt-name">5 dias</div><div class="opt-desc">Nivel avanzado</div><div class="bar"><div class="bar-fill" style="width:9%"></div></div></div>
+        <div class="opt-r"><div class="opt-stat">9%</div><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s8')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S8: TIEMPO POR SESION (SLIDER)
+═══════════════════════════════════════════ -->
+<div class="screen" id="s8">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:48%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 8 de 17</div>
+    <div class="big-q">CUANTO TIEMPO POR SESION</div>
+    <div class="sub-q">El tiempo que puedes dedicar a cada entreno.</div>
+    <div class="slider-wrap">
+      <div class="slider-val" id="time-val">45</div>
+      <div class="slider-unit">MINUTOS</div>
+      <input type="range" min="20" max="120" step="5" value="45" id="time-slider" oninput="document.getElementById('time-val').textContent=this.value;D.sessionTime=this.value+'min'">
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s9')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S9: HORA DE ENTRENAR
+═══════════════════════════════════════════ -->
+<div class="screen" id="s9">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:54%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 9 de 17</div>
+    <div class="big-q">CUANDO SUELES ENTRENAR</div>
+    <div class="sub-q">Te ayuda a organizar tu rutina diaria.</div>
+    <div class="time-opts">
+      <div class="time-opt" onclick="selTime(this,'Manana')">
+        <div class="t-icon">○</div>
+        <div class="t-name">MANANA</div>
+      </div>
+      <div class="time-opt" onclick="selTime(this,'Tarde')">
+        <div class="t-icon">◑</div>
+        <div class="t-name">TARDE</div>
+      </div>
+      <div class="time-opt" onclick="selTime(this,'Noche')">
+        <div class="t-icon">●</div>
+        <div class="t-name">NOCHE</div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s10')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     IMPACT 2: CONSTANCIA
+═══════════════════════════════════════════ -->
+<div class="screen" id="impact2">
+  <div class="impact">
+    <div class="impact-hero">
+      <div class="impact-tag">Ciencia del gym</div>
+      <div class="impact-title">LA CONSTANCIA BATE AL <span>ESFUERZO</span></div>
+      <div class="impact-sub">Entrenar 3 dias seguidos durante 8 semanas da mejores resultados que entrenar 6 dias durante 4 semanas.</div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#fff"></div>3 dias / 8 semanas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#444"></div>6 dias / 4 semanas</div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 320 160" preserveAspectRatio="none">
+        <line x1="0" y1="40" x2="320" y2="40" stroke="#222" stroke-width="1"/>
+        <line x1="0" y1="80" x2="320" y2="80" stroke="#222" stroke-width="1"/>
+        <line x1="0" y1="120" x2="320" y2="120" stroke="#222" stroke-width="1"/>
+        <!-- 6 dias burns out -->
+        <path d="M 20,120 C 60,80 90,40 130,35 C 160,32 180,60 220,90 C 260,115 290,125 300,130" stroke="#444" stroke-width="2" fill="none"/>
+        <!-- 3 dias steady progress -->
+        <path d="M 20,120 C 60,110 100,95 150,75 C 200,55 250,38 300,28" stroke="#fff" stroke-width="2.5" fill="none"/>
+        <circle cx="300" cy="28" r="5" fill="#fff"/>
+        <circle cx="300" cy="130" r="5" fill="#444"/>
+      </svg>
+      <div class="chart-labels">
+        <span class="chart-label">Sem 1</span>
+        <span class="chart-label">Sem 3</span>
+        <span class="chart-label">Sem 6</span>
+        <span class="chart-label">Sem 8</span>
+      </div>
+    </div>
+    <div class="stats-impact">
+      <div class="stat-impact"><div class="stat-impact-val">3x</div><div class="stat-impact-lbl">Mejores resultados con constancia</div></div>
+      <div class="stat-impact"><div class="stat-impact-val">8sem</div><div class="stat-impact-lbl">Para ver cambios reales</div></div>
+    </div>
+    <div style="padding:0 28px;margin-top:auto;padding-bottom:36px;padding-top:24px;max-width:480px;margin-left:auto;margin-right:auto;width:100%">
+      <button class="btn" onclick="go('s10')">Lo entiendo</button>
+    </div>
   </div>
 </div>
 
-<!-- S6: Generando -->
-<div class="screen" id="s6">
-  <div class="gen-wrap">
-    <div class="gen-title">GENERANDO TU PLAN</div>
-    <div class="gen-sub">La IA esta analizando tus datos y creando<br>un plan completamente personalizado para ti.</div>
-    <div class="gen-steps">
-      <div class="gen-step" id="step1"><div class="step-dot"></div><div class="step-text">Analizando tu perfil</div></div>
-      <div class="gen-step" id="step2"><div class="step-dot"></div><div class="step-text">Calculando tu IMC y necesidades</div></div>
-      <div class="gen-step" id="step3"><div class="step-dot"></div><div class="step-text">Creando rutina semanal</div></div>
-      <div class="gen-step" id="step4"><div class="step-dot"></div><div class="step-text">Anadiendo cardio y descansos</div></div>
-      <div class="gen-step" id="step5"><div class="step-dot"></div><div class="step-text">Finalizando tu plan</div></div>
+<!-- ═══════════════════════════════════════════
+     S10: PARTES DEL CUERPO
+═══════════════════════════════════════════ -->
+<div class="screen" id="s10">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 10 de 17</div>
+    <div class="big-q">QUE PARTE QUIERES MEJORAR MAS</div>
+    <div class="sub-q">Selecciona todas las que quieras.</div>
+    <div class="body-grid">
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Pecho</div><div class="b-desc">Pectorales</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Espalda</div><div class="b-desc">Dorsal y lumbar</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Piernas</div><div class="b-desc">Cuadriceps y femoral</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Hombros</div><div class="b-desc">Deltoides</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Brazos</div><div class="b-desc">Biceps y triceps</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Abdomen</div><div class="b-desc">Core y abs</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Gluteos</div><div class="b-desc">Gluteo mayor</div></div>
+      <div class="body-opt" onclick="this.classList.toggle('sel')"><div class="b-name">Todo</div><div class="b-desc">Cuerpo completo</div></div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="s10Next()">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S11: LESIONES
+═══════════════════════════════════════════ -->
+<div class="screen" id="s11">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:66%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 11 de 17</div>
+    <div class="big-q">TIENES ALGUNA LESION</div>
+    <div class="sub-q">Para evitar ejercicios que puedan hacerte dano.</div>
+    <div class="inj-opts">
+      <div class="opt" onclick="selOpt(this,'s11','injury')">
+        <div class="opt-l"><div class="opt-name">No, estoy bien</div><div class="opt-desc">Sin limitaciones fisicas</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s11','injury')">
+        <div class="opt-l"><div class="opt-name">Rodilla</div><div class="opt-desc">Evitaremos sentadillas profundas</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s11','injury')">
+        <div class="opt-l"><div class="opt-name">Espalda baja</div><div class="opt-desc">Evitaremos carga lumbar</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s11','injury')">
+        <div class="opt-l"><div class="opt-name">Hombro</div><div class="opt-desc">Evitaremos press sobre cabeza</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s11','injury')">
+        <div class="opt-l"><div class="opt-name">Otra lesion</div><div class="opt-desc">Lo tendremos en cuenta</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s12')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S12: SUENO
+═══════════════════════════════════════════ -->
+<div class="screen" id="s12">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:72%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 12 de 17</div>
+    <div class="big-q">CUANTO DUERMES DE MEDIA</div>
+    <div class="sub-q">El sueno afecta directamente a tus resultados en el gym.</div>
+    <div class="opts" style="margin-top:28px">
+      <div class="opt" onclick="selOpt(this,'s12','sleep')">
+        <div class="opt-l"><div class="opt-name">Menos de 6h</div><div class="opt-desc">Poco sueno, recuperacion lenta</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s12','sleep')">
+        <div class="opt-l"><div class="opt-name">6 - 7 horas</div><div class="opt-desc">Por debajo de lo optimo</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s12','sleep')">
+        <div class="opt-l"><div class="opt-name">7 - 8 horas</div><div class="opt-desc">Buena recuperacion</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s12','sleep')">
+        <div class="opt-l"><div class="opt-name">Mas de 8h</div><div class="opt-desc">Recuperacion optima</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s13')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S13: DIETA
+═══════════════════════════════════════════ -->
+<div class="screen" id="s13">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:78%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 13 de 17</div>
+    <div class="big-q">QUE TIPO DE DIETA SIGUES</div>
+    <div class="sub-q">Para crear tu plan de comidas personalizado.</div>
+    <div class="opts">
+      <div class="opt" onclick="selOpt(this,'s13','diet')">
+        <div class="opt-l"><div class="opt-name">Equilibrada</div><div class="opt-desc">Como de todo sin restricciones</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s13','diet')">
+        <div class="opt-l"><div class="opt-name">Alta proteina</div><div class="opt-desc">Prioritizo proteinas</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s13','diet')">
+        <div class="opt-l"><div class="opt-name">Vegetariana</div><div class="opt-desc">Sin carne</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s13','diet')">
+        <div class="opt-l"><div class="opt-name">Vegana</div><div class="opt-desc">Sin productos animales</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s13','diet')">
+        <div class="opt-l"><div class="opt-name">Keto / Low carb</div><div class="opt-desc">Pocos carbohidratos</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s14')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S14: ALERGIAS
+═══════════════════════════════════════════ -->
+<div class="screen" id="s14">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:84%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 14 de 17</div>
+    <div class="big-q">ALERGIAS O RESTRICCIONES</div>
+    <div class="sub-q">Selecciona todo lo que no puedes comer.</div>
+    <div class="multi-grid">
+      <div class="chip" onclick="this.classList.toggle('sel')">Lactosa</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Gluten</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Frutos secos</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Huevo</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Marisco</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Pescado</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Soja</div>
+      <div class="chip" onclick="this.classList.toggle('sel')">Cerdo</div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="s14Next()">Continuar</button><button class="btn-ghost" onclick="go('s15')">No tengo ninguna</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S15: COMIDAS AL DIA (SCROLL PICKER)
+═══════════════════════════════════════════ -->
+<div class="screen" id="s15">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:90%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 15 de 17</div>
+    <div class="big-q">CUANTAS COMIDAS AL DIA</div>
+    <div class="sub-q">Repartiremos tus calorias entre estas comidas.</div>
+    <div class="pick-wrap" id="pick-meals">
+      <div class="pick-line-top"></div>
+      <div class="pick-line-bot"></div>
+      <div class="pick-list" id="pick-list">
+        <div class="pick-item" data-val="1">1</div>
+        <div class="pick-item" data-val="2">2</div>
+        <div class="pick-item active" data-val="3">3</div>
+        <div class="pick-item" data-val="4">4</div>
+        <div class="pick-item" data-val="5">5</div>
+        <div class="pick-item" data-val="6">6</div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('s16')">Continuar</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S16: DONDE NOS CONOCISTE
+═══════════════════════════════════════════ -->
+<div class="screen" id="s16">
+  <div class="logo-top">REPZERO</div>
+  <div class="progress"><div class="progress-fill" style="width:96%"></div></div>
+  <div class="wrap" style="padding-top:24px;flex:1;padding-bottom:140px">
+    <div class="step-lbl">Paso 16 de 17</div>
+    <div class="big-q">DONDE NOS CONOCISTE</div>
+    <div class="sub-q">Nos ayuda a saber donde estais.</div>
+    <div class="opts" style="margin-top:28px">
+      <div class="opt" onclick="selOpt(this,'s16','source')">
+        <div class="opt-l"><div class="opt-name">TikTok</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s16','source')">
+        <div class="opt-l"><div class="opt-name">Instagram</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s16','source')">
+        <div class="opt-l"><div class="opt-name">Google</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s16','source')">
+        <div class="opt-l"><div class="opt-name">Un amigo</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+      <div class="opt" onclick="selOpt(this,'s16','source')">
+        <div class="opt-l"><div class="opt-name">Otro</div></div>
+        <div class="opt-r"><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="generatePlan()">Generar mi plan</button></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     S17: GENERANDO
+═══════════════════════════════════════════ -->
+<div class="screen" id="s17">
+  <div style="flex:1;display:flex;flex-direction:column;">
+    <div class="gen-center">
+      <div class="gen-logo">REPZERO</div>
+      <div class="gen-title">La IA esta analizando tus datos<br>y creando tu plan exacto.</div>
+      <div class="gen-steps">
+        <div class="gen-step" id="gs1"><div class="s-dot"></div><div class="s-txt">Analizando tu perfil fisico</div></div>
+        <div class="gen-step" id="gs2"><div class="s-dot"></div><div class="s-txt">Calculando calorias y macros</div></div>
+        <div class="gen-step" id="gs3"><div class="s-dot"></div><div class="s-txt">Creando rutina semanal</div></div>
+        <div class="gen-step" id="gs4"><div class="s-dot"></div><div class="s-txt">Anadiendo cardio y descansos</div></div>
+        <div class="gen-step" id="gs5"><div class="s-dot"></div><div class="s-txt">Generando plan de comidas</div></div>
+        <div class="gen-step" id="gs6"><div class="s-dot"></div><div class="s-txt">Finalizando tu plan</div></div>
+      </div>
     </div>
   </div>
 </div>
 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const supabase = createClient(
+  'https://msmwaldktlrxhxvarepj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbXdhbGRrdGxyeGh4dmFyZXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzQwNzcsImV4cCI6MjA5NzU1MDA3N30.Lpr8P9SsTG_7i_iPORqu2gt9pffpnvaZ_oqx5wsCQwI'
+);
 
-  const supabase = createClient(
-    'https://msmwaldktlrxhxvarepj.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbXdhbGRrdGxyeGh4dmFyZXBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzQwNzcsImV4cCI6MjA5NzU1MDA3N30.Lpr8P9SsTG_7i_iPORqu2gt9pffpnvaZ_oqx5wsCQwI'
-  );
+window.D = {};
+const history = [];
 
-  const data = {};
+window.go = function(id) {
+  const cur = document.querySelector('.screen.active');
+  if (cur) history.push(cur.id);
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('back-btn').style.display = id === 's0' ? 'none' : 'flex';
+  window.scrollTo(0,0);
+};
 
-  window.sel = function(el, screenId) {
-    document.querySelectorAll('#' + screenId + ' .option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-  };
+window.goBack = function() {
+  if (!history.length) return;
+  const prev = history.pop();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(prev).classList.add('active');
+  document.getElementById('back-btn').style.display = prev === 's0' ? 'none' : 'flex';
+};
 
-  window.goS2 = function() {
-    data.name = document.getElementById('inp-name').value.trim() || 'Usuario';
-    data.age = document.getElementById('inp-age').value || '16';
-    data.weight = document.getElementById('inp-weight').value || '70';
-    data.height = document.getElementById('inp-height').value || '175';
-    show('s2');
-  };
+window.selOpt = function(el, screenId, key) {
+  document.querySelectorAll('#'+screenId+' .opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  D[key] = el.querySelector('.opt-name').textContent;
+};
 
-  window.goS3 = function() {
-    const s = getSelected('s2');
-    if (!s) return;
-    data.goal = s;
-    show('s3');
-  };
+window.selGender = function(el, val) {
+  document.querySelectorAll('#s2 .gender-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  D.gender = val;
+};
 
-  window.goS4 = function() {
-    const s = getSelected('s3');
-    if (!s) return;
-    data.level = s;
-    show('s4');
-  };
+window.selTime = function(el, val) {
+  document.querySelectorAll('.time-opt').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+  D.trainTime = val;
+};
 
-  window.goS5 = function() {
-    const s = getSelected('s4');
-    if (!s) return;
-    data.days = s;
-    show('s5');
-  };
+window.s1Next = function() {
+  D.name = document.getElementById('i-name').value.trim() || 'Usuario';
+  D.age = document.getElementById('i-age').value || '16';
+  D.weight = document.getElementById('i-weight').value || '70';
+  D.height = document.getElementById('i-height').value || '175';
+  go('s2');
+};
 
-  window.generatePlan = async function() {
-    const s = getSelected('s5');
-    if (!s) return;
-    data.source = s;
-    show('s6');
+window.s4Next = function() {
+  D.extraGoals = [...document.querySelectorAll('#s4 .chip.sel')].map(c => c.textContent).join(', ') || 'Ninguno';
+  go('impact1');
+};
 
-    // Animate steps
-    const steps = ['step1','step2','step3','step4','step5'];
-    for (let i = 0; i < steps.length; i++) {
-      await delay(800);
-      document.getElementById(steps[i]).classList.add('done');
-    }
+window.s10Next = function() {
+  D.bodyParts = [...document.querySelectorAll('#s10 .body-opt.sel')].map(c => c.querySelector('.b-name').textContent).join(', ') || 'Todo';
+  go('s11');
+};
 
-    const imc = (data.weight / ((data.height / 100) ** 2)).toFixed(1);
+window.s14Next = function() {
+  D.allergies = [...document.querySelectorAll('#s14 .chip.sel')].map(c => c.textContent).join(', ') || 'Ninguna';
+  go('s15');
+};
 
-    const prompt = `Eres un entrenador personal experto. Crea un plan de gym semanal personalizado en español para:
-- Nombre: ${data.name}
-- Edad: ${data.age} años
-- Peso: ${data.weight}kg, Altura: ${data.height}cm, IMC: ${imc}
-- Objetivo: ${data.goal}
-- Nivel: ${data.level}
-- Dias de entreno por semana: ${data.days}
+// Scroll picker
+const pickList = document.getElementById('pick-list');
+const items = pickList.querySelectorAll('.pick-item');
+let activeIdx = 2;
+D.meals = '3';
+
+items.forEach((item, i) => {
+  item.addEventListener('click', () => {
+    items.forEach(it => it.classList.remove('active'));
+    item.classList.add('active');
+    activeIdx = i;
+    D.meals = item.dataset.val;
+  });
+});
+
+window.generatePlan = async function() {
+  D.source = document.querySelector('#s16 .opt.sel .opt-name')?.textContent || 'Otro';
+  D.meals = D.meals || '3';
+  go('s17');
+
+  const steps = ['gs1','gs2','gs3','gs4','gs5','gs6'];
+  for (let s of steps) {
+    await delay(900);
+    document.getElementById(s).classList.add('done');
+  }
+
+  const imc = (parseFloat(D.weight) / ((parseFloat(D.height)/100)**2)).toFixed(1);
+
+  const prompt = `Eres un entrenador personal y nutricionista experto. Crea un plan completo en español para:
+Nombre: ${D.name}, Edad: ${D.age}años, Sexo: ${D.gender||'No especificado'}, Peso: ${D.weight}kg, Altura: ${D.height}cm, IMC: ${imc}
+Objetivo: ${D.goal||'Ganar musculo'}, Objetivos extra: ${D.extraGoals||'Ninguno'}
+Nivel gym: ${D.level||'Principiante'}, Historial: ${D.quit||'No especificado'}
+Dias/semana: ${D.days||'3 dias'}, Tiempo/sesion: ${D.sessionTime||'45min'}, Hora entreno: ${D.trainTime||'Tarde'}
+Partes a mejorar: ${D.bodyParts||'Todo'}, Lesiones: ${D.injury||'Ninguna'}, Sueno: ${D.sleep||'7-8 horas'}
+Dieta: ${D.diet||'Equilibrada'}, Alergias: ${D.allergies||'Ninguna'}, Comidas/dia: ${D.meals}
 
 Devuelve SOLO JSON sin texto adicional ni markdown:
 {
-  "weekPlan": [
-    {
-      "day": "Lunes",
-      "type": "fuerza",
-      "focus": "Pecho y Triceps",
-      "duration": 45,
-      "exercises": [
-        { "name": "Press de banca", "machine": "Maquina Smith", "sets": 3, "reps": 10, "rest": 60 }
-      ],
-      "cardio": { "include": false }
-    }
-  ],
-  "restDays": ["Martes","Jueves","Sabado","Domingo"],
-  "quote": "Frase corta y potente",
-  "tip": "Consejo practico segun su perfil",
-  "weeklyGoal": "Objetivo concreto para esta semana"
+  "weekPlan": [{"day":"Lunes","type":"fuerza","focus":"Pecho y Triceps","duration":45,"exercises":[{"name":"Press de banca","machine":"Maquina Smith","sets":3,"reps":10,"rest":60}],"cardio":{"include":false}}],
+  "restDays":["Martes"],
+  "mealPlan": [{"meal":"Desayuno","foods":["Avena 80g","Platano","Proteina en polvo"],"calories":450,"protein":35,"carbs":60,"fat":8}],
+  "dailyCalories": 2200,
+  "dailyProtein": 160,
+  "dailyWater": 2.5,
+  "quote": "Frase corta potente",
+  "tip": "Consejo practico",
+  "weeklyGoal": "Objetivo concreto esta semana",
+  "bmi": ${imc},
+  "bmiCategory": "Normal"
 }
-- Incluye SOLO dias de entreno, no dias de descanso en weekPlan
-- Maximo 5 ejercicios por dia
-- Incluye cardio al menos 1 dia si el objetivo es perder peso
-- cardio format: { "include": true, "type": "Cinta de correr", "duration": 20, "intensity": "Moderada" }
-- Adapta el peso y reps exactamente al nivel indicado`;
+- weekPlan: solo dias de entreno, max 5 ejercicios
+- cardio: {"include":true,"type":"Cinta","duration":20,"intensity":"Moderada"} si aplica
+- mealPlan: ${D.meals} comidas adaptadas a su dieta y alergias`;
 
-    try {
-      const res = await fetch('/.netlify/functions/generate-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1500,
-          messages: [{ role: 'user', content: prompt }]
-        })
+  try {
+    const res = await fetch('/.netlify/functions/generate-plan', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt })
+    });
+    const json = await res.json();
+    const text = json.content[0].text;
+    const clean = text.replace(/```json|```/g,'').trim();
+    const plan = JSON.parse(clean);
+
+    const { data:{ user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from('repzero_profiles').upsert({
+        user_id: user.id,
+        name: D.name, age: parseInt(D.age),
+        weight: parseFloat(D.weight), height: parseFloat(D.height),
+        goal: D.goal, level: D.level,
+        days_per_week: D.days, source: D.source, plan
       });
-
-      const json = await res.json();
-      const text = json.content[0].text;
-      const clean = text.replace(/```json|```/g, '').trim();
-      const plan = JSON.parse(clean);
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('repzero_profiles').upsert({
-          user_id: user.id,
-          name: data.name,
-          age: parseInt(data.age),
-          weight: parseFloat(data.weight),
-          height: parseFloat(data.height),
-          goal: data.goal,
-          level: data.level,
-          days_per_week: data.days,
-          source: data.source,
-          plan: plan
-        });
-      }
-
-      window.location.href = 'home.html';
-
-    } catch (e) {
-      console.error(e);
-      // Fallback
-      const plan = {
-        weekPlan: [
-          { day: "Lunes", type: "fuerza", focus: "Pecho y Triceps", duration: 45, exercises: [
-            { name: "Press de banca", machine: "Maquina Smith", sets: 3, reps: 10, rest: 60 },
-            { name: "Aperturas con mancuernas", machine: "Banco plano", sets: 3, reps: 12, rest: 60 },
-            { name: "Fondos en paralelas", machine: "Peso corporal", sets: 3, reps: 8, rest: 90 },
-            { name: "Extensiones de triceps", machine: "Polea alta", sets: 3, reps: 15, rest: 60 }
-          ], cardio: { include: false }},
-          { day: "Miercoles", type: "fuerza", focus: "Espalda y Biceps", duration: 45, exercises: [
-            { name: "Jalones al pecho", machine: "Polea alta", sets: 3, reps: 10, rest: 60 },
-            { name: "Remo con mancuerna", machine: "Banco inclinado", sets: 3, reps: 10, rest: 60 },
-            { name: "Curl con mancuernas", machine: "Mancuernas", sets: 3, reps: 12, rest: 60 },
-            { name: "Curl en polea", machine: "Polea baja", sets: 3, reps: 15, rest: 60 }
-          ], cardio: { include: false }},
-          { day: "Viernes", type: "fuerza", focus: "Piernas y Hombros", duration: 50, exercises: [
-            { name: "Sentadilla", machine: "Maquina Smith", sets: 3, reps: 10, rest: 90 },
-            { name: "Prensa de piernas", machine: "Prensa", sets: 3, reps: 12, rest: 90 },
-            { name: "Press militar", machine: "Mancuernas", sets: 3, reps: 10, rest: 60 },
-            { name: "Elevaciones laterales", machine: "Mancuernas", sets: 3, reps: 15, rest: 60 }
-          ], cardio: { include: false }}
-        ],
-        restDays: ["Martes","Jueves","Sabado","Domingo"],
-        quote: "No empieces el lunes. Empieza ahora.",
-        tip: "Descansa 60 segundos entre series. La calidad importa mas que el peso.",
-        weeklyGoal: "Completar los 3 dias de entreno sin faltar ninguno"
-      };
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('repzero_profiles').upsert({
-          user_id: user.id,
-          name: data.name,
-          age: parseInt(data.age),
-          weight: parseFloat(data.weight),
-          height: parseFloat(data.height),
-          goal: data.goal,
-          level: data.level,
-          days_per_week: data.days,
-          source: data.source,
-          plan: plan
-        });
-      }
-      window.location.href = 'home.html';
     }
-  };
-
-  function getSelected(screenId) {
-    const el = document.querySelector('#' + screenId + ' .option.selected');
-    return el ? el.querySelector('.opt-name').textContent : null;
+    window.location.href = 'home.html';
+  } catch(e) {
+    console.error(e);
+    window.location.href = 'home.html';
   }
+};
 
-  function show(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
-  }
+function delay(ms) { return new Promise(r => setTimeout(r,ms)); }
 
-  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+// Check session
+supabase.auth.getSession().then(({data:{session}}) => {
+  if (!session) window.location.href = 'login.html';
+});
 </script>
 </body>
 </html>
