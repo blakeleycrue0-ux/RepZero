@@ -1,4 +1,4 @@
-[functions]
+[build]
   directory = "netlify/functions"
 
 [[redirects]]
