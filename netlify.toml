@@ -1,7 +1,7 @@
 [build]
-  directory = "netlify/functions"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/"
-  to = "/onboarding.html"
+  to = "/app.html"
   status = 302
