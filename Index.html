@@ -400,16 +400,19 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
   <div class="ob-prog"><div class="ob-prog-fill" style="width:38%"></div></div>
   <div class="wrap" style="flex:1;padding-top:18px;padding-bottom:140px">
     <div class="step-lbl">Paso 5 de 13</div>
-    <div class="big-q">DIAS POR SEMANA</div>
-    <div class="sub-q">La constancia gana siempre. Se realista.</div>
-    <div class="opts">
-      <div class="opt" onclick="selOpt(this,'q5','days')"><div class="ol"><div class="on">2 dias</div><div class="od">Empezar con calma</div><div class="obar-wrap"><div class="obar" style="width:15%"></div></div></div><div class="or"><div class="os">15%</div><div class="dot"></div></div></div>
-      <div class="opt" onclick="selOpt(this,'q5','days')"><div class="ol"><div class="on">3 dias</div><div class="od">Lo mas recomendado</div><div class="obar-wrap"><div class="obar" style="width:48%"></div></div></div><div class="or"><div class="os">48%</div><div class="dot"></div></div></div>
-      <div class="opt" onclick="selOpt(this,'q5','days')"><div class="ol"><div class="on">4 dias</div><div class="od">Para los que van en serio</div><div class="obar-wrap"><div class="obar" style="width:28%"></div></div></div><div class="or"><div class="os">28%</div><div class="dot"></div></div></div>
-      <div class="opt" onclick="selOpt(this,'q5','days')"><div class="ol"><div class="on">5 dias</div><div class="od">Nivel avanzado</div><div class="obar-wrap"><div class="obar" style="width:9%"></div></div></div><div class="or"><div class="os">9%</div><div class="dot"></div></div></div>
+    <div class="big-q">QUE DIAS VAS AL GYM</div>
+    <div class="sub-q">Elige exactamente los dias que quieres entrenar.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:22px" id="day-picker">
+      <div class="opt" onclick="toggleDay(this,'Lunes')"><div class="ol"><div class="on">Lunes</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Martes')"><div class="ol"><div class="on">Martes</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Miercoles')"><div class="ol"><div class="on">Miercoles</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Jueves')"><div class="ol"><div class="on">Jueves</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Viernes')"><div class="ol"><div class="on">Viernes</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Sabado')"><div class="ol"><div class="on">Sabado</div></div><div class="or"><div class="dot"></div></div></div>
+      <div class="opt" onclick="toggleDay(this,'Domingo')"><div class="ol"><div class="on">Domingo</div></div><div class="or"><div class="dot"></div></div></div>
     </div>
   </div>
-  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="go('q6')">Continuar</button></div></div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="q5Next()">Continuar</button></div></div>
 </div>
 
 <!-- ═══ Q6: TIEMPO ═══ -->
@@ -711,20 +714,53 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
   <!-- TAB: NUTRICION -->
   <div class="htab" id="tab-nutricion">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:46px;margin-bottom:4px;margin-top:28px">NUTRICION</div>
-    <div style="color:var(--text2);font-size:12px;margin-bottom:24px">Plan de comidas generado por IA para ti</div>
-    <div class="macro-bar">
-      <div class="macro-title" id="n-cals-big">-</div>
-      <div class="macro-sub">Calorias diarias recomendadas</div>
-      <div class="macro-grid">
-        <div class="macro-item"><div class="macro-val" id="n-prot">-</div><div class="macro-lbl">Proteina g</div></div>
-        <div class="macro-item"><div class="macro-val" id="n-carbs">-</div><div class="macro-lbl">Carbos g</div></div>
-        <div class="macro-item"><div class="macro-val" id="n-fat">-</div><div class="macro-lbl">Grasa g</div></div>
+    <div style="color:var(--text2);font-size:12px;margin-bottom:24px">Plan de comidas personalizado</div>
+
+    <!-- FREE: macros only -->
+    <div id="n-free">
+      <div class="macro-bar">
+        <div class="macro-title" id="n-cals-big">-</div>
+        <div class="macro-sub">Calorias diarias estimadas</div>
+        <div class="macro-grid">
+          <div class="macro-item"><div class="macro-val" id="n-prot">-</div><div class="macro-lbl">Proteina g</div></div>
+          <div class="macro-item"><div class="macro-val" id="n-carbs">-</div><div class="macro-lbl">Carbos g</div></div>
+          <div class="macro-item"><div class="macro-val" id="n-fat">-</div><div class="macro-lbl">Grasa g</div></div>
+        </div>
+      </div>
+      <div class="section-lbl">Cardio recomendado</div>
+      <div class="cardio-card" id="n-cardio"><div class="cardio-title">Cargando...</div></div>
+
+      <!-- PRO LOCK -->
+      <div style="background:var(--dark);border:1px solid var(--line);border-radius:12px;padding:28px;margin-top:16px;text-align:center">
+        <div style="font-size:32px;margin-bottom:12px">▣</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;margin-bottom:8px">PLAN DE COMIDAS PRO</div>
+        <div style="color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:20px">Desbloquea tu plan de comidas 100% personalizado. Claude analiza tus preferencias, lo que te gusta, lo que no, y cuanto tiempo tienes para cocinar.</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;margin-bottom:4px">8€<span style="font-size:18px;color:var(--text)">/mes</span></div>
+        <div style="color:var(--text);font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:20px">O 99€/AÑO — AHORRA 37%</div>
+        <button class="btn" onclick="startPro()">Desbloquear ahora</button>
+        <div style="color:var(--text);font-size:11px;margin-top:12px">Demo gratuita disponible</div>
       </div>
     </div>
-    <div class="section-lbl">Cardio recomendado</div>
-    <div class="cardio-card" id="n-cardio"><div class="cardio-title">Cargando...</div></div>
-    <div class="section-lbl" style="margin-top:8px">Plan de comidas</div>
-    <div id="meal-list"></div>
+
+    <!-- PRO: meal plan -->
+    <div id="n-pro" style="display:none">
+      <div class="macro-bar">
+        <div class="macro-title" id="n-cals-big-pro">-</div>
+        <div class="macro-sub">Calorias diarias personalizadas</div>
+        <div class="macro-grid">
+          <div class="macro-item"><div class="macro-val" id="n-prot-pro">-</div><div class="macro-lbl">Proteina g</div></div>
+          <div class="macro-item"><div class="macro-val" id="n-carbs-pro">-</div><div class="macro-lbl">Carbos g</div></div>
+          <div class="macro-item"><div class="macro-val" id="n-fat-pro">-</div><div class="macro-lbl">Grasa g</div></div>
+        </div>
+      </div>
+      <div class="section-lbl">Cardio recomendado</div>
+      <div class="cardio-card" id="n-cardio-pro"><div class="cardio-title">Cargando...</div></div>
+      <div class="section-lbl" style="margin-top:8px">Tu plan de comidas</div>
+      <div id="meal-list"></div>
+      <div style="margin-top:16px">
+        <button class="btn" style="background:transparent;color:var(--text);border:1px solid var(--line)" onclick="regenerateMeals()">Regenerar plan de comidas</button>
+      </div>
+    </div>
   </div>
 
   <!-- TAB: PROGRESO -->
@@ -780,13 +816,99 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
     <div class="profile-row"><div class="profile-row-label">Objetivo</div><div class="profile-row-val" id="pf-goal">-</div></div>
     <div class="profile-row"><div class="profile-row-label">Nivel</div><div class="profile-row-val" id="pf-level">-</div></div>
     <div class="profile-row"><div class="profile-row-label">Dias por semana</div><div class="profile-row-val" id="pf-days">-</div></div>
-    <div class="profile-row"><div class="profile-row-label">Peso</div><div class="profile-row-val" id="pf-weight">-</div></div>
+    <div class="profile-row">
+  <div class="profile-row-label">Peso</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="profile-row-val" id="pf-weight">-</div>
+    <div id="weight-edit-btn" onclick="showWeightEdit()" style="color:var(--text);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid var(--line);padding:4px 8px;border-radius:4px">Editar</div>
+  </div>
+</div>
+<div id="weight-edit-wrap" style="display:none;padding:12px 0">
+  <input type="number" id="weight-new" placeholder="Nuevo peso en kg" inputmode="decimal" style="margin-bottom:8px">
+  <button class="btn" onclick="saveWeight()" style="padding:14px">Guardar</button>
+</div>
     <div class="profile-row"><div class="profile-row-label">Altura</div><div class="profile-row-val" id="pf-height">-</div></div>
     <div class="profile-row"><div class="profile-row-label">Dieta</div><div class="profile-row-val" id="pf-diet">-</div></div>
     <div class="profile-row"><div class="profile-row-label">IMC</div><div class="profile-row-val" id="pf-bmi">-</div></div>
     <div style="margin-top:32px;padding-bottom:40px">
       <button class="btn" style="background:transparent;color:var(--white);border:1px solid var(--line);margin-bottom:10px" onclick="resetPlan()">Rehacer onboarding</button>
       <button class="btn" style="background:transparent;color:var(--text);border:1px solid var(--line)" onclick="logout()">Cerrar sesion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRO FOOD QUESTIONS ═══ -->
+<div class="page" id="p-food-q">
+  <div style="flex:1;padding:40px 22px 140px;max-width:480px;margin:0 auto;width:100%">
+    <img src="logo.png" style="width:36px;height:36px;object-fit:contain;filter:invert(1);margin-bottom:24px" alt="RZ">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:1;margin-bottom:8px">TU PLAN DE COMIDAS</div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:32px;line-height:1.6">Cuéntanos tus preferencias para que Claude cree tu plan perfecto.</div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label class="lbl">Cuantas veces a la semana puedes cocinar</label>
+        <div class="chips" id="cook-freq">
+          <div class="chip" onclick="selChipSingle(this,'cook-freq','cookFreq')">1-2 veces</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-freq','cookFreq')">3-4 veces</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-freq','cookFreq')">Todos los dias</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-freq','cookFreq')">Casi nunca cocino</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="lbl">Cuanto tiempo tienes para cocinar por comida</label>
+        <div class="chips" id="cook-time">
+          <div class="chip" onclick="selChipSingle(this,'cook-time','cookTime')">Menos de 15 min</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-time','cookTime')">15-30 min</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-time','cookTime')">30-60 min</div>
+          <div class="chip" onclick="selChipSingle(this,'cook-time','cookTime')">Sin limite</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="lbl">Comes fuera de casa habitualmente</label>
+        <div class="chips" id="eat-out">
+          <div class="chip" onclick="selChipSingle(this,'eat-out','eatOut')">Casi nunca</div>
+          <div class="chip" onclick="selChipSingle(this,'eat-out','eatOut')">1-2 veces por semana</div>
+          <div class="chip" onclick="selChipSingle(this,'eat-out','eatOut')">Casi todos los dias</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="lbl">Alimentos que NO te gustan o no comes (escribe)</label>
+        <input type="text" id="food-hate" placeholder="Ej: brocoli, higado, mariscos...">
+      </div>
+
+      <div>
+        <label class="lbl">Alimentos que te encantan (escribe)</label>
+        <input type="text" id="food-love" placeholder="Ej: pollo, arroz, huevos...">
+      </div>
+
+      <div>
+        <label class="lbl">Objetivo adicional de nutricion</label>
+        <div class="chips" id="nutr-goal">
+          <div class="chip" onclick="this.classList.toggle('sel')">Ganar masa</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">Reducir grasa</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">Energia para entrenar</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">Mejor digestion</div>
+          <div class="chip" onclick="this.classList.toggle('sel')">Comer mas sano</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="generateMealPlan()">Generar mi plan de comidas</button></div></div>
+</div>
+
+<!-- ═══ GENERANDO COMIDAS ═══ -->
+<div class="page" id="p-meal-gen">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;text-align:center;max-width:480px;margin:0 auto;width:100%">
+    <img src="logo.png" style="width:48px;height:48px;object-fit:contain;filter:invert(1);margin-bottom:20px" alt="RZ">
+    <div style="color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:36px">Creando tu plan de comidas personalizado...</div>
+    <div class="gen-steps">
+      <div class="gstep" id="mgs1"><div class="sdot"></div><div class="stxt">Analizando tus preferencias</div></div>
+      <div class="gstep" id="mgs2"><div class="sdot"></div><div class="stxt">Calculando macros y calorias</div></div>
+      <div class="gstep" id="mgs3"><div class="sdot"></div><div class="stxt">Creando comidas personalizadas</div></div>
+      <div class="gstep" id="mgs4"><div class="sdot"></div><div class="stxt">Ajustando a tus restricciones</div></div>
     </div>
   </div>
 </div>
@@ -859,6 +981,24 @@ window.q1Next = function() {
   D.height = document.getElementById('q-height').value || '175';
   go('q2');
 };
+window.toggleDay = function(el, day) {
+  if (!D.trainingDays) D.trainingDays = [];
+  if (el.classList.contains('sel')) {
+    el.classList.remove('sel');
+    D.trainingDays = D.trainingDays.filter(d=>d!==day);
+  } else {
+    el.classList.add('sel');
+    D.trainingDays.push(day);
+  }
+};
+window.q5Next = function() {
+  if (!D.trainingDays || D.trainingDays.length === 0) {
+    alert('Selecciona al menos un dia');
+    return;
+  }
+  D.days = D.trainingDays.join(', ');
+  go('q6');
+};
 window.q7Next = function() {
   D.bodyParts = [...document.querySelectorAll('#q7 .chip.sel')].map(c=>c.textContent).join(', ') || 'Todo el cuerpo';
   go('q8');
@@ -916,12 +1056,12 @@ window.generatePlan = async function() {
 
   const imc = (parseFloat(D.weight)/((parseFloat(D.height)/100)**2)).toFixed(1);
 
-  const prompt = `Crea un plan de gym y nutricion en JSON para: ${D.name}, ${D.age}a, ${D.gender||'H'}, ${D.weight}kg, ${D.height}cm, IMC:${imc}. Objetivo:${D.goal||'Ganar musculo'}. Nivel:${D.level||'Principiante'}. Dias:${D.days||'3 dias'}. Tiempo:${D.sessionTime||'45min'}. Lesion:${D.injury||'No'}. Dieta:${D.diet||'Equilibrada'}. Alergias:${D.allergies||'No'}. Sueno:${D.sleep||'7h'}.
+  const prompt = `Crea un plan de gym y nutricion en JSON para: ${D.name}, ${D.age}a, ${D.gender||'H'}, ${D.weight}kg, ${D.height}cm, IMC:${imc}. Objetivo:${D.goal||'Ganar musculo'}. Nivel:${D.level||'Principiante'}. Dias de entreno exactos:${D.days||'Lunes, Miercoles, Viernes'}. Tiempo:${D.sessionTime||'45min'}. Lesion:${D.injury||'No'}. Dieta:${D.diet||'Equilibrada'}. Alergias:${D.allergies||'No'}. Sueno:${D.sleep||'7h'}.
 
 JSON SOLO, sin markdown:
 {"weekPlan":[{"day":"Lunes","focus":"Pecho","duration":45,"exercises":[{"name":"Press banca","machine":"Smith","sets":3,"reps":10,"rest":60,"howTo":"Descripcion breve.","tips":"Tip breve."}],"cardio":{"include":false}}],"restDays":["Martes"],"mealPlan":[{"meal":"Desayuno","time":"8:00","foods":["Avena 80g","Platano"],"calories":420,"protein":22,"carbs":68,"fat":7}],"dailyCalories":2200,"dailyProtein":160,"dailyCarbs":220,"dailyFat":70,"dailyWater":2.5,"dailySteps":8000,"cardioWeekly":{"type":"Cinta","duration":20,"frequency":"2x semana","intensity":"Moderada"},"quote":"Frase corta.","tip":"Consejo.","weeklyGoal":"Objetivo semana.","motivation":{"title":"Titulo","text":"Texto motivacional."},"bmi":${imc},"bmiCategory":"Normal"}
 
-Adapta TODO al perfil. ${D.goal?.includes('perder')?'Deficit 350kcal.':''} ${D.goal?.includes('musculo')?'Supravit 250kcal.':''} Max 4 ejercicios/dia. Solo dias de entreno en weekPlan.`;
+Adapta TODO al perfil. ${D.goal?.includes('perder')?'Deficit 350kcal.':''} ${D.goal?.includes('musculo')?'Supravit 250kcal.':''} Max 4 ejercicios/dia. En weekPlan usa EXACTAMENTE estos dias: ${D.days||'Lunes, Miercoles, Viernes'}.`;
 
   try {
     const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
@@ -1013,57 +1153,63 @@ function loadHome(profile) {
   else showRestDay();
 
   // PLAN TAB
-  document.getElementById('plan-sub').textContent = (profile.goal||'-') + ' — ' + (profile.days_per_week||profile.days||'-');
-  const pdays = document.getElementById('plan-days');
+  var planSub = document.getElementById('plan-sub');
+  if(planSub) planSub.textContent = (profile.goal||'-') + ' — ' + (profile.days_per_week||profile.days||'-');
+  var pdays = document.getElementById('plan-days');
   pdays.innerHTML='';
-  const allDays = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'];
-  allDays.forEach(d => {
-    const w = plan.weekPlan?.find(x=>x.day===d);
+  var allDays = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'];
+  allDays.forEach(function(d) {
+    var w = plan.weekPlan && plan.weekPlan.find(function(x){return x.day===d;});
     if (w) {
-      const card = document.createElement('div');
-      card.className='plan-day-card';
-      card.innerHTML=`
-        <div class="plan-day-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-          <div class="plan-day-left">
-            <div class="plan-day-name">${d.toUpperCase()}</div>
-            <div class="plan-day-focus">${w.focus}</div>
-          </div>
-          <div class="plan-day-right">
-            <div class="plan-day-dur">${w.duration||45}m</div>
-            <div class="plan-day-count">${w.exercises.length} ejercicios</div>
-          </div>
-        </div>
-        <div class="plan-day-body">
-          ${w.exercises.map((ex,i)=>`
-            <div class="plan-ex">
-              <div class="plan-ex-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-                <div class="plan-ex-num">0${i+1}</div>
-                <div class="plan-ex-name">${ex.name}</div>
-                <div class="plan-ex-sets">${ex.sets}x${ex.reps}</div>
-              </div>
-              <div class="plan-ex-detail">
-                <div class="plan-ex-machine">${ex.machine} — ${ex.rest||60}s descanso</div>
-                ${ex.howTo ? `<div class="plan-ex-how">${ex.howTo}</div>` : ''}
-                ${ex.tips ? `<div class="plan-ex-how" style="margin-top:6px;color:var(--text2)">${ex.tips}</div>` : ''}
-                <div class="plan-ex-tags">
-                  <div class="plan-ex-tag">${ex.sets} series</div>
-                  <div class="plan-ex-tag">${ex.reps} reps</div>
-                  <div class="plan-ex-tag">${ex.rest||60}s descanso</div>
-                </div>
-              </div>
-            </div>`).join('')}
-          ${w.cardio?.include?`
-            <div class="plan-ex">
-              <div class="plan-ex-hdr">
-                <div class="plan-ex-num">+</div>
-                <div class="plan-ex-name">Cardio — ${w.cardio.type}</div>
-                <div class="plan-ex-sets">${w.cardio.duration}m</div>
-              </div>
-            </div>`:''}
-        </div>`;
+      var card = document.createElement('div');
+      card.className = 'plan-day-card';
+
+      var hdr = document.createElement('div');
+      hdr.className = 'plan-day-hdr';
+      hdr.innerHTML = '<div class="plan-day-left"><div class="plan-day-name">'+d.toUpperCase()+'</div><div class="plan-day-focus">'+(w.focus||'')+'</div></div>'
+        + '<div class="plan-day-right"><div class="plan-day-dur">'+(w.duration||45)+'m</div><div class="plan-day-count">'+(w.exercises?w.exercises.length:0)+' ejercicios</div></div>';
+
+      var body = document.createElement('div');
+      body.className = 'plan-day-body';
+
+      hdr.onclick = function() { body.classList.toggle('open'); };
+
+      (w.exercises||[]).forEach(function(ex, i) {
+        var exDiv = document.createElement('div');
+        exDiv.className = 'plan-ex';
+
+        var exHdr = document.createElement('div');
+        exHdr.className = 'plan-ex-hdr';
+        exHdr.innerHTML = '<div class="plan-ex-num">0'+(i+1)+'</div><div class="plan-ex-name">'+(ex.name||'')+'</div><div class="plan-ex-sets">'+(ex.sets||3)+'x'+(ex.reps||10)+'</div>';
+
+        var exDetail = document.createElement('div');
+        exDetail.className = 'plan-ex-detail';
+        exDetail.innerHTML = '<div class="plan-ex-machine">'+(ex.machine||'')+(ex.rest?' — '+ex.rest+'s descanso':'')+'</div>'
+          + (ex.howTo ? '<div class="plan-ex-how">'+ex.howTo+'</div>' : '')
+          + (ex.tips ? '<div class="plan-ex-how" style="margin-top:6px;color:var(--text2)">'+ex.tips+'</div>' : '')
+          + '<div class="plan-ex-tags"><div class="plan-ex-tag">'+(ex.sets||3)+' series</div><div class="plan-ex-tag">'+(ex.reps||10)+' reps</div><div class="plan-ex-tag">'+(ex.rest||60)+'s descanso</div></div>';
+
+        exHdr.onclick = function(e) { e.stopPropagation(); exDetail.classList.toggle('open'); };
+        exDiv.appendChild(exHdr);
+        exDiv.appendChild(exDetail);
+        body.appendChild(exDiv);
+      });
+
+      if (w.cardio && w.cardio.include) {
+        var cardioDiv = document.createElement('div');
+        cardioDiv.className = 'plan-ex';
+        cardioDiv.innerHTML = '<div class="plan-ex-hdr"><div class="plan-ex-num">+</div><div class="plan-ex-name">Cardio — '+(w.cardio.type||'')+'</div><div class="plan-ex-sets">'+(w.cardio.duration||20)+'m</div></div>';
+        body.appendChild(cardioDiv);
+      }
+
+      card.appendChild(hdr);
+      card.appendChild(body);
       pdays.appendChild(card);
     } else {
-      pdays.innerHTML+=`<div class="rest-day-plan"><div class="rest-name">${d.toUpperCase()}</div><div class="rest-badge">Descanso</div></div>`;
+      var restDiv = document.createElement('div');
+      restDiv.className = 'rest-day-plan';
+      restDiv.innerHTML = '<div class="rest-name">'+d.toUpperCase()+'</div><div class="rest-badge">Descanso</div>';
+      pdays.appendChild(restDiv);
     }
   });
 
@@ -1088,7 +1234,7 @@ function loadHome(profile) {
         <div class="meal-cals">${m.calories}kcal</div>
       </div>
       <div class="meal-body">
-        ${(m.foods||m.items||[]).map(f=>`<div class="meal-food">${f}</div>`).join('')}
+        ${(m.foods||m.items||m.alimentos||[]).map(f=>`<div class="meal-food">${typeof f==='object'?f.name||f.alimento||JSON.stringify(f):f}</div>`).join('')}
         <div class="meal-macros">
           <div class="meal-macro"><div class="meal-macro-val">${m.protein}g</div><div class="meal-macro-lbl">Proteina</div></div>
           <div class="meal-macro"><div class="meal-macro-val">${m.carbs}g</div><div class="meal-macro-lbl">Carbos</div></div>
@@ -1198,15 +1344,211 @@ window.uploadAvatar = function(input) {
 };
 
 // Logout & reset
+window.showWeightEdit = function() {
+  const wrap = document.getElementById('weight-edit-wrap');
+  wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+};
+window.saveWeight = function() {
+  const newWeight = document.getElementById('weight-new').value;
+  if (!newWeight) return;
+  const saved = localStorage.getItem('rz_plan');
+  if (saved) {
+    const profile = JSON.parse(saved);
+    profile.weight = parseFloat(newWeight);
+    localStorage.setItem('rz_plan', JSON.stringify(profile));
+    document.getElementById('pf-weight').textContent = newWeight + ' kg';
+    document.getElementById('weight-edit-wrap').style.display = 'none';
+  }
+};
+window.startPro = function() {
+  const modal = document.createElement('div');
+  modal.id = 'pro-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;display:flex;align-items:flex-end;';
+  const inner = document.createElement('div');
+  inner.style.cssText = 'background:#111;border-top:1px solid #222;border-radius:16px 16px 0 0;padding:32px 24px 48px;width:100%;max-width:480px;margin:0 auto';
+  inner.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:36px;margin-bottom:8px">REPZERO PRO</div>'
+    + '<div style="color:#555;font-size:13px;margin-bottom:24px;line-height:1.6">Plan de comidas 100% personalizado generado por IA segun tus gustos y estilo de vida.</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">'
+    + '<div style="background:#0f0f0f;border:1px solid #222;border-radius:8px;padding:16px;text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:36px">8€</div><div style="color:#555;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase">por mes</div></div>'
+    + '<div style="background:#fff;border-radius:8px;padding:16px;text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:36px;color:#000">99€</div><div style="color:#333;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase">por año</div><div style="color:#555;font-size:10px">ahorra 37%</div></div>'
+    + '</div>'
+    + '<button id="pro-demo-btn" style="width:100%;background:#fff;color:#000;border:none;padding:18px;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:6px;font-family:Inter,sans-serif;margin-bottom:10px">Probar gratis ahora</button>'
+    + '<button id="pro-cancel-btn" style="width:100%;background:transparent;color:#555;border:none;padding:12px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Cancelar</button>';
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+  document.getElementById('pro-demo-btn').onclick = window.activateProDemo;
+  document.getElementById('pro-cancel-btn').onclick = function() { document.getElementById('pro-modal').remove(); };
+};
+
+window.activateProDemo = function() {
+  document.querySelector('div[style*="fixed"][style*="z-index:999"]')?.remove();
+  localStorage.setItem('rz_pro', 'true');
+  go('p-food-q');
+};
+
+window.selChipSingle = function(el, groupId, key) {
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  window.FD = window.FD || {};
+  window.FD[key] = el.textContent;
+};
+
+window.generateMealPlan = async function() {
+  window.FD = window.FD || {};
+  FD.foodHate = document.getElementById('food-hate').value || 'Ninguno';
+  FD.foodLove = document.getElementById('food-love').value || 'Cualquier cosa';
+  FD.nutrGoals = [...document.querySelectorAll('#nutr-goal .chip.sel')].map(c=>c.textContent).join(', ') || 'General';
+  
+  go('p-meal-gen');
+  const steps = ['mgs1','mgs2','mgs3','mgs4'];
+  for (let s of steps) { await delay(800); document.getElementById(s).classList.add('done'); }
+
+  const saved = localStorage.getItem('rz_plan');
+  const profile = saved ? JSON.parse(saved) : {};
+
+  const prompt = `Crea un plan de comidas PERSONALIZADO en JSON para: ${profile.name||'Usuario'}, ${profile.age||'20'}a, ${profile.weight||'70'}kg. Objetivo:${profile.goal||'Ganar musculo'}. Dieta:${profile.diet||'Equilibrada'}. Alergias:${profile.allergies||'No'}. Calorias necesarias:${profile.plan?.dailyCalories||2200}kcal. Proteina:${profile.plan?.dailyProtein||160}g.
+Preferencias: Cocina ${FD.cookFreq||'3-4 veces'} por semana. Tiempo por comida: ${FD.cookTime||'15-30 min'}. Come fuera: ${FD.eatOut||'poco'}. No le gusta: ${FD.foodHate}. Le encanta: ${FD.foodLove}. Objetivos extra: ${FD.nutrGoals}.
+JSON SOLO sin markdown:
+{"mealPlan":[{"meal":"Desayuno","time":"8:00","foods":["Avena 80g","Platano"],"calories":420,"protein":22,"carbs":68,"fat":7}],"dailyCalories":2200,"dailyProtein":160,"dailyCarbs":220,"dailyFat":70,"tip":"Consejo nutricional personalizado"}
+Incluye 4-5 comidas. Adapta TODO a sus preferencias. No incluyas alimentos que no le gustan.`;
+
+  try {
+    const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt})
+    });
+    const json = await res.json();
+    const text = json.content[0].text;
+    const mealData = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    // Save meal plan
+    if (saved) {
+      const p = JSON.parse(saved);
+      if (!p.plan) p.plan = {};
+      p.plan.mealPlan = mealData.mealPlan;
+      p.plan.dailyCalories = mealData.dailyCalories || p.plan.dailyCalories;
+      p.plan.dailyProtein = mealData.dailyProtein || p.plan.dailyProtein;
+      p.plan.dailyCarbs = mealData.dailyCarbs || p.plan.dailyCarbs;
+      p.plan.dailyFat = mealData.dailyFat || p.plan.dailyFat;
+      localStorage.setItem('rz_plan', JSON.stringify(p));
+      renderMeals(mealData.mealPlan, mealData);
+    }
+
+    showProNutricion();
+    showTab('nutricion');
+    go('p-home');
+
+  } catch(e) {
+    alert('Error: ' + e.message);
+    go('p-home');
+    showTab('nutricion');
+  }
+};
+
+function renderMeals(meals, data) {
+  var calsEl = document.getElementById('n-cals-big-pro');
+  var protEl = document.getElementById('n-prot-pro');
+  var carbEl = document.getElementById('n-carbs-pro');
+  var fatEl = document.getElementById('n-fat-pro');
+  if(calsEl) calsEl.textContent = data.dailyCalories || '-';
+  if(protEl) protEl.textContent = (data.dailyProtein||'-') + 'g';
+  if(carbEl) carbEl.textContent = (data.dailyCarbs||'-') + 'g';
+  if(fatEl) fatEl.textContent = (data.dailyFat||'-') + 'g';
+
+  var mealList = document.getElementById('meal-list');
+  mealList.innerHTML = '';
+
+  (meals||[]).forEach(function(m) {
+    var foods = m.foods || m.items || m.alimentos || [];
+
+    var card = document.createElement('div');
+    card.className = 'meal-card';
+
+    var hdr = document.createElement('div');
+    hdr.className = 'meal-hdr';
+
+    var hdrLeft = document.createElement('div');
+    var nameDiv = document.createElement('div');
+    nameDiv.className = 'meal-name';
+    nameDiv.textContent = m.meal || '';
+    hdrLeft.appendChild(nameDiv);
+    if (m.time) {
+      var timeDiv = document.createElement('div');
+      timeDiv.style.cssText = 'color:var(--text);font-size:11px;margin-top:2px';
+      timeDiv.textContent = m.time;
+      hdrLeft.appendChild(timeDiv);
+    }
+
+    var calsDiv = document.createElement('div');
+    calsDiv.className = 'meal-cals';
+    calsDiv.textContent = (m.calories || 0) + 'kcal';
+
+    hdr.appendChild(hdrLeft);
+    hdr.appendChild(calsDiv);
+
+    var body = document.createElement('div');
+    body.className = 'meal-body';
+
+    foods.forEach(function(f) {
+      var fd = document.createElement('div');
+      fd.className = 'meal-food';
+      fd.textContent = typeof f === 'object' ? (f.name || f.alimento || JSON.stringify(f)) : f;
+      body.appendChild(fd);
+    });
+
+    var macros = document.createElement('div');
+    macros.className = 'meal-macros';
+    [['Proteina', m.protein], ['Carbos', m.carbs], ['Grasa', m.fat]].forEach(function(pair) {
+      var mc = document.createElement('div');
+      mc.className = 'meal-macro';
+      mc.innerHTML = '<div class="meal-macro-val">' + (pair[1]||0) + 'g</div><div class="meal-macro-lbl">' + pair[0] + '</div>';
+      macros.appendChild(mc);
+    });
+    body.appendChild(macros);
+
+    hdr.onclick = function() { body.classList.toggle('open'); };
+    card.appendChild(hdr);
+    card.appendChild(body);
+    mealList.appendChild(card);
+  });
+}
+
+function showProNutricion() {
+  document.getElementById('n-free').style.display='none';
+  document.getElementById('n-pro').style.display='block';
+  const saved = localStorage.getItem('rz_plan');
+  if (saved) {
+    const p = JSON.parse(saved);
+    const cardio = p.plan && p.plan.cardioWeekly;
+    const cardioEl = document.getElementById('n-cardio-pro');
+    if (cardio) {
+      cardioEl.innerHTML = '<div class="cardio-title">'+cardio.type+'</div><div class="cardio-detail">'+cardio.duration+' min — '+cardio.intensity+'<br>'+cardio.frequency+'</div>';
+    } else {
+      cardioEl.innerHTML = '<div class="cardio-title">Sin cardio esta semana</div>';
+    }
+    if (p.plan && p.plan.mealPlan) renderMeals(p.plan.mealPlan, p.plan);
+  }
+}
+
+window.regenerateMeals = function() {
+  go('p-food-q');
+};
+
 window.logout = async function() {
   await SB.auth.signOut();
   localStorage.removeItem('rz_plan');
   localStorage.removeItem('rz_avatar');
   go('p-welcome');
 };
+window.goPro = function() {
+  // Redirect to Stripe — update with your real Stripe link
+  alert('Proximamente — pago con Stripe. Por ahora la nutricion esta disponible para todos.');
+};
 window.resetPlan = function() {
   localStorage.removeItem('rz_plan');
-  go('p-welcome');
+  window.D = {};
+  go('q1');
 };
 
 // Fallback plan
@@ -1253,8 +1595,14 @@ const saved = localStorage.getItem('rz_plan');
 if (saved) {
   try {
     const profile = JSON.parse(saved);
-    if (profile && profile.plan) { loadHome(profile); go('p-home'); }
-    else go('p-welcome');
+    if (profile && profile.plan) {
+      loadHome(profile);
+      go('p-home');
+      // Check if pro and has meal plan
+      if (localStorage.getItem('rz_pro') === 'true' && profile.plan.mealPlan) {
+        showProNutricion();
+      }
+    } else go('p-welcome');
   } catch(e) { go('p-welcome'); }
 } else {
   SB.auth.getSession().then(async ({data:{session}}) => {
