@@ -1088,7 +1088,7 @@ function loadHome(profile) {
         <div class="meal-cals">${m.calories}kcal</div>
       </div>
       <div class="meal-body">
-        ${m.foods.map(f=>`<div class="meal-food">${f}</div>`).join('')}
+        ${(m.foods||m.items||[]).map(f=>`<div class="meal-food">${f}</div>`).join('')}
         <div class="meal-macros">
           <div class="meal-macro"><div class="meal-macro-val">${m.protein}g</div><div class="meal-macro-lbl">Proteina</div></div>
           <div class="meal-macro"><div class="meal-macro-val">${m.carbs}g</div><div class="meal-macro-lbl">Carbos</div></div>
