@@ -916,85 +916,12 @@ window.generatePlan = async function() {
 
   const imc = (parseFloat(D.weight)/((parseFloat(D.height)/100)**2)).toFixed(1);
 
-  const prompt = `Eres entrenador personal y nutricionista experto. Crea un plan COMPLETAMENTE PERSONALIZADO en español para esta persona especifica:
-Nombre: ${D.name}, Edad: ${D.age} anos, Sexo: ${D.gender||'No especificado'}
-Peso: ${D.weight}kg, Altura: ${D.height}cm, IMC: ${imc}
-Objetivo principal: ${D.goal||'Ganar musculo'}
-Nivel en el gym: ${D.level||'Principiante'}
-Dias de entreno por semana: ${D.days||'3 dias'}
-Tiempo por sesion: ${D.sessionTime||'45min'}
-Partes del cuerpo a mejorar: ${D.bodyParts||'Todo el cuerpo'}
-Lesiones: ${D.injury||'Ninguna'}
-Horas de sueno: ${D.sleep||'7-8 horas'}
-Tipo de dieta: ${D.diet||'Equilibrada'}
-Alergias y restricciones: ${D.allergies||'Ninguna'}
-Objetivos adicionales: ${D.extraGoals||'Ninguno'}
+  const prompt = `Crea un plan de gym y nutricion en JSON para: ${D.name}, ${D.age}a, ${D.gender||'H'}, ${D.weight}kg, ${D.height}cm, IMC:${imc}. Objetivo:${D.goal||'Ganar musculo'}. Nivel:${D.level||'Principiante'}. Dias:${D.days||'3 dias'}. Tiempo:${D.sessionTime||'45min'}. Lesion:${D.injury||'No'}. Dieta:${D.diet||'Equilibrada'}. Alergias:${D.allergies||'No'}. Sueno:${D.sleep||'7h'}.
 
-IMPORTANTE: El plan debe ser 100% especifico para esta persona. Los ejercicios, calorias, macros y comidas deben adaptarse exactamente a su objetivo, nivel, peso, altura y restricciones.
+JSON SOLO, sin markdown:
+{"weekPlan":[{"day":"Lunes","focus":"Pecho","duration":45,"exercises":[{"name":"Press banca","machine":"Smith","sets":3,"reps":10,"rest":60,"howTo":"Descripcion breve.","tips":"Tip breve."}],"cardio":{"include":false}}],"restDays":["Martes"],"mealPlan":[{"meal":"Desayuno","time":"8:00","foods":["Avena 80g","Platano"],"calories":420,"protein":22,"carbs":68,"fat":7}],"dailyCalories":2200,"dailyProtein":160,"dailyCarbs":220,"dailyFat":70,"dailyWater":2.5,"dailySteps":8000,"cardioWeekly":{"type":"Cinta","duration":20,"frequency":"2x semana","intensity":"Moderada"},"quote":"Frase corta.","tip":"Consejo.","weeklyGoal":"Objetivo semana.","motivation":{"title":"Titulo","text":"Texto motivacional."},"bmi":${imc},"bmiCategory":"Normal"}
 
-Devuelve SOLO JSON valido sin markdown ni texto adicional:
-{
-  "weekPlan": [
-    {
-      "day": "Lunes",
-      "type": "fuerza",
-      "focus": "Pecho y Triceps",
-      "duration": 45,
-      "exercises": [
-        {
-          "name": "Press de banca",
-          "machine": "Maquina Smith",
-          "sets": 3,
-          "reps": 10,
-          "rest": 60,
-          "howTo": "Tumba en el banco, agarra la barra con las manos algo mas anchas que los hombros. Baja controlado hasta el pecho y empuja hacia arriba.",
-          "tips": "Mantén los pies en el suelo y los hombros apoyados en el banco."
-        }
-      ],
-      "cardio": {"include": false}
-    }
-  ],
-  "restDays": ["Martes", "Jueves", "Sabado", "Domingo"],
-  "mealPlan": [
-    {
-      "meal": "Desayuno",
-      "time": "8:00",
-      "foods": ["Avena 80g con leche", "Platano mediano", "Cafe sin azucar"],
-      "calories": 420,
-      "protein": 22,
-      "carbs": 68,
-      "fat": 7
-    }
-  ],
-  "dailyCalories": 2200,
-  "dailyProtein": 160,
-  "dailyCarbs": 220,
-  "dailyFat": 70,
-  "dailyWater": 2.5,
-  "dailySteps": 8000,
-  "cardioWeekly": {
-    "type": "Cinta de correr",
-    "duration": 20,
-    "frequency": "2 veces por semana",
-    "intensity": "Moderada — 65% frecuencia cardiaca maxima"
-  },
-  "quote": "Frase motivacional corta y potente adaptada al objetivo de esta persona",
-  "tip": "Consejo practico especifico para su nivel y objetivo",
-  "weeklyGoal": "Objetivo concreto y especifico para esta semana",
-  "motivation": {
-    "title": "Titulo motivacional segun su objetivo",
-    "text": "Mensaje personalizado de 2-3 frases adaptado a su objetivo y nivel"
-  },
-  "bmi": ${imc},
-  "bmiCategory": "Normal"
-}
-REGLAS:
-- cardio en dia de entreno si aplica: {"include": true, "type": "Eliptica", "duration": 15, "intensity": "Ligera"}
-- mealPlan: exactamente las comidas que correspondan a la dieta indicada, respetando alergias
-- Si el objetivo es perder peso: deficit calorico de 300-400kcal
-- Si el objetivo es ganar musculo: supravit de 200-300kcal
-- Si es principiante: ejercicios basicos, pocas series, mucho descanso
-- howTo debe ser una instruccion clara de 1-2 frases en espanol`;
+Adapta TODO al perfil. ${D.goal?.includes('perder')?'Deficit 350kcal.':''} ${D.goal?.includes('musculo')?'Supravit 250kcal.':''} Max 4 ejercicios/dia. Solo dias de entreno en weekPlan.`;
 
   try {
     const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
