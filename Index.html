@@ -1021,6 +1021,8 @@ REGLAS:
     go('p-home');
   } catch(e) {
     console.error('Error generating plan:', e);
+    // Show error to user temporarily
+    alert('Error: ' + e.message + ' — usando plan de respaldo');
     const profile = {...D, plan: fallbackPlan()};
     localStorage.setItem('rz_plan', JSON.stringify(profile));
     loadHome(profile);
