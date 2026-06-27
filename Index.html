@@ -823,15 +823,10 @@ Devuelve SOLO JSON sin markdown:
 - mealPlan: 3-5 comidas adaptadas a dieta y alergias`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':'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',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt})
     });
     const json = await res.json();
     const text = json.content[0].text;
@@ -1065,4 +1060,3 @@ if (saved) {
 </script>
 </body>
 </html>
-
