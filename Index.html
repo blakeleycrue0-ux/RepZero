@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RepZero">
+<meta name="theme-color" content="#000000">
 <title>RepZero</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -130,6 +136,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
 .day-cell.today .day-n,.day-cell.today .day-d { color:var(--black); }
 .day-cell.selected:not(.today) { border-color:#444; }
 .day-cell.selected:not(.today) .day-n,.day-cell.selected:not(.today) .day-d { color:var(--white); }
+.day-cell.has-workout .day-n { color:#888; }
+.day-cell.has-workout .day-d { color:#888; }
 
 /* DAILY SUMMARY */
 .daily-summary { background:var(--dark); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:32px; }
@@ -1126,24 +1134,40 @@ function loadHome(profile) {
   renderGlasses();
 
   // Days strip
-  const strip = document.getElementById('h-days');
+  var strip = document.getElementById('h-days');
   strip.innerHTML='';
-  for (let i=0;i<7;i++) {
-    const d = new Date(today);
+  for (var i=0;i<7;i++) {
+    var d = new Date(today);
     d.setDate(today.getDate() - today.getDay() + i);
-    const isToday = d.toDateString()===today.toDateString();
-    const dayName = DAYS[i];
-    const hasWorkout = plan.weekPlan?.some(w=>w.day===dayName);
-    const cell = document.createElement('div');
-    cell.className = 'day-cell' + (isToday?' today':'') + (hasWorkout?' has-workout':'') + (isToday?' selected':'');
-    cell.innerHTML = `<div class="day-n">${DAYS_S[i]}</div><div class="day-d">${d.getDate()}</div>`;
-    cell.onclick = () => {
-      document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('selected'));
-      cell.classList.add('selected');
-      const w = plan.weekPlan?.find(x=>x.day===dayName);
-      if (w) renderWorkout(w);
-      else showRestDay();
-    };
+    var isToday = d.toDateString()===today.toDateString();
+    var dayName = DAYS[i];
+    var hasWorkout = plan.weekPlan && plan.weekPlan.some(function(w){return w.day===dayName;});
+    var cell = document.createElement('div');
+    var cls = 'day-cell';
+    if (isToday) cls += ' today selected';
+    if (hasWorkout && !isToday) cls += ' has-workout';
+    cell.className = cls;
+    var nameDiv = document.createElement('div');
+    nameDiv.className = 'day-n';
+    nameDiv.textContent = DAYS_S[i];
+    var numDiv = document.createElement('div');
+    numDiv.className = 'day-d';
+    numDiv.textContent = d.getDate();
+    // Show dot under training days
+    if (hasWorkout && !isToday) {
+      numDiv.style.borderBottom = '2px solid #555';
+    }
+    cell.appendChild(nameDiv);
+    cell.appendChild(numDiv);
+    (function(dn, c) {
+      c.onclick = function() {
+        document.querySelectorAll('.day-cell').forEach(function(x){x.classList.remove('selected');});
+        c.classList.add('selected');
+        var w = plan.weekPlan && plan.weekPlan.find(function(x){return x.day===dn;});
+        if (w) renderWorkout(w);
+        else showRestDay();
+      };
+    })(dayName, cell);
     strip.appendChild(cell);
   }
 
@@ -1214,35 +1238,23 @@ function loadHome(profile) {
   });
 
   // NUTRICION TAB
-  document.getElementById('n-cals-big').textContent = plan.dailyCalories || '-';
-  document.getElementById('n-prot').textContent = (plan.dailyProtein||'-')+'g';
-  document.getElementById('n-carbs').textContent = (plan.dailyCarbs||'-')+'g';
-  document.getElementById('n-fat').textContent = (plan.dailyFat||'-')+'g';
-  const cardio = plan.cardioWeekly;
-  document.getElementById('n-cardio').innerHTML = cardio
-    ? `<div class="cardio-title">${cardio.type}</div><div class="cardio-detail">${cardio.duration} min — ${cardio.intensity}<br>${cardio.frequency}</div>`
-    : `<div class="cardio-title">Sin cardio especificado</div><div class="cardio-detail">Enfocate en la fuerza esta semana</div>`;
-  const mealList = document.getElementById('meal-list');
-  mealList.innerHTML='';
-  plan.mealPlan?.forEach(m=>{
-    mealList.innerHTML+=`<div class="meal-card">
-      <div class="meal-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-        <div>
-          <div class="meal-name">${m.meal}</div>
-          ${m.time?`<div style="color:var(--text);font-size:11px;margin-top:2px">${m.time}</div>`:''}
-        </div>
-        <div class="meal-cals">${m.calories}kcal</div>
-      </div>
-      <div class="meal-body">
-        ${(m.foods||m.items||m.alimentos||[]).map(f=>`<div class="meal-food">${typeof f==='object'?f.name||f.alimento||JSON.stringify(f):f}</div>`).join('')}
-        <div class="meal-macros">
-          <div class="meal-macro"><div class="meal-macro-val">${m.protein}g</div><div class="meal-macro-lbl">Proteina</div></div>
-          <div class="meal-macro"><div class="meal-macro-val">${m.carbs}g</div><div class="meal-macro-lbl">Carbos</div></div>
-          <div class="meal-macro"><div class="meal-macro-val">${m.fat}g</div><div class="meal-macro-lbl">Grasa</div></div>
-        </div>
-      </div>
-    </div>`;
-  });
+  var nCals = document.getElementById('n-cals-big');
+  var nProt = document.getElementById('n-prot');
+  var nCarbs = document.getElementById('n-carbs');
+  var nFat = document.getElementById('n-fat');
+  if(nCals) nCals.textContent = plan.dailyCalories || '-';
+  if(nProt) nProt.textContent = (plan.dailyProtein||'-') + 'g';
+  if(nCarbs) nCarbs.textContent = (plan.dailyCarbs||'-') + 'g';
+  if(nFat) nFat.textContent = (plan.dailyFat||'-') + 'g';
+  var cardio = plan.cardioWeekly;
+  var nCardio = document.getElementById('n-cardio');
+  if(nCardio) {
+    if (cardio) {
+      nCardio.innerHTML = '<div class="cardio-title">'+cardio.type+'</div><div class="cardio-detail">'+cardio.duration+' min — '+cardio.intensity+'<br>'+cardio.frequency+'</div>';
+    } else {
+      nCardio.innerHTML = '<div class="cardio-title">Sin cardio esta semana</div><div class="cardio-detail">Enfocate en la fuerza</div>';
+    }
+  }
 
   // PROGRESO TAB
   document.getElementById('pg-weight-val').textContent = (profile.weight||'-')+'kg';
@@ -1272,7 +1284,7 @@ function loadHome(profile) {
   // PERFIL TAB
   const avatarSaved = localStorage.getItem('rz_avatar');
   if (avatarSaved) {
-    document.getElementById('pf-avatar').innerHTML = `<img src="${avatarSaved}" alt="avatar">`;
+    var avEl = document.getElementById('pf-avatar'); avEl.innerHTML = ''; var avImg = document.createElement('img'); avImg.src = avatarSaved; avImg.alt='avatar'; avEl.appendChild(avImg);
   } else {
     document.getElementById('pf-avatar').textContent = (profile.name||'U')[0].toUpperCase();
   }
@@ -1288,19 +1300,29 @@ function loadHome(profile) {
 }
 
 function renderWorkout(w) {
-  document.getElementById('h-workout-title').textContent = w.focus.toUpperCase();
-  document.getElementById('h-workout-meta').textContent = w.exercises.length + ' ejercicios — ' + (w.duration||45) + ' min — ' + 'Hoy';
+  document.getElementById('h-workout-title').textContent = (w.focus||'').toUpperCase();
+  document.getElementById('h-workout-meta').textContent = (w.exercises?w.exercises.length:0) + ' ejercicios — ' + (w.duration||45) + ' min';
   document.getElementById('h-cta').style.display='block';
-  const list = document.getElementById('h-exercises');
+  var list = document.getElementById('h-exercises');
   list.innerHTML='';
-  w.exercises.forEach((ex,i)=>{
-    const div = document.createElement('div');
+  (w.exercises||[]).forEach(function(ex, i) {
+    var div = document.createElement('div');
     div.className='ex-row';
-    div.innerHTML=`<div class="ex-num">0${i+1}</div><div class="ex-info"><div class="ex-name">${ex.name}</div><div class="ex-detail">${ex.machine} — ${ex.rest||60}s descanso</div></div><div class="ex-sets">${ex.sets}x${ex.reps}</div><div class="ex-check" onclick="this.classList.toggle('done')"></div>`;
+    var num = document.createElement('div'); num.className='ex-num'; num.textContent='0'+(i+1);
+    var info = document.createElement('div'); info.className='ex-info';
+    var name = document.createElement('div'); name.className='ex-name'; name.textContent=ex.name||'';
+    var detail = document.createElement('div'); detail.className='ex-detail'; detail.textContent=(ex.machine||'') + ' — ' + (ex.rest||60) + 's descanso';
+    info.appendChild(name); info.appendChild(detail);
+    var sets = document.createElement('div'); sets.className='ex-sets'; sets.textContent=(ex.sets||3)+'x'+(ex.reps||10);
+    var check = document.createElement('div'); check.className='ex-check';
+    check.onclick = function() { check.classList.toggle('done'); };
+    div.appendChild(num); div.appendChild(info); div.appendChild(sets); div.appendChild(check);
     list.appendChild(div);
   });
-  if (w.cardio?.include) {
-    list.innerHTML+=`<div class="ex-row"><div class="ex-num">+</div><div class="ex-info"><div class="ex-name">Cardio — ${w.cardio.type}</div><div class="ex-detail">${w.cardio.duration}min — ${w.cardio.intensity}</div></div><div class="ex-sets">${w.cardio.duration}m</div><div class="ex-check" onclick="this.classList.toggle('done')"></div></div>`;
+  if (w.cardio && w.cardio.include) {
+    var cdiv = document.createElement('div'); cdiv.className='ex-row';
+    cdiv.innerHTML = '<div class="ex-num">+</div><div class="ex-info"><div class="ex-name">Cardio — '+(w.cardio.type||'')+'</div><div class="ex-detail">'+(w.cardio.duration||20)+'min — '+(w.cardio.intensity||'Moderada')+'</div></div><div class="ex-sets">'+(w.cardio.duration||20)+'m</div>';
+    list.appendChild(cdiv);
   }
 }
 
@@ -1338,7 +1360,7 @@ window.uploadAvatar = function(input) {
   const reader = new FileReader();
   reader.onload = e => {
     localStorage.setItem('rz_avatar', e.target.result);
-    document.getElementById('pf-avatar').innerHTML = `<img src="${e.target.result}" alt="avatar">`;
+    document.getElementById('pf-avatar').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover" alt="avatar">';
   };
   reader.readAsDataURL(file);
 };
@@ -1361,23 +1383,77 @@ window.saveWeight = function() {
   }
 };
 window.startPro = function() {
-  const modal = document.createElement('div');
+  var modal = document.createElement('div');
   modal.id = 'pro-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;display:flex;align-items:flex-end;';
-  const inner = document.createElement('div');
-  inner.style.cssText = 'background:#111;border-top:1px solid #222;border-radius:16px 16px 0 0;padding:32px 24px 48px;width:100%;max-width:480px;margin:0 auto';
-  inner.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:36px;margin-bottom:8px">REPZERO PRO</div>'
-    + '<div style="color:#555;font-size:13px;margin-bottom:24px;line-height:1.6">Plan de comidas 100% personalizado generado por IA segun tus gustos y estilo de vida.</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">'
-    + '<div style="background:#0f0f0f;border:1px solid #222;border-radius:8px;padding:16px;text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:36px">8€</div><div style="color:#555;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase">por mes</div></div>'
-    + '<div style="background:#fff;border-radius:8px;padding:16px;text-align:center"><div style="font-family:Bebas Neue,sans-serif;font-size:36px;color:#000">99€</div><div style="color:#333;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase">por año</div><div style="color:#555;font-size:10px">ahorra 37%</div></div>'
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:999;display:flex;align-items:flex-end;overflow-y:auto;';
+
+  var reviews = [
+    {name:'Carlos M.', age:17, stars:5, text:'Llevo 2 meses y he ganado 4kg de musculo. El plan es exactamente lo que necesitaba para empezar.'},
+    {name:'Diego R.', age:19, stars:5, text:'Nunca habia ido al gym y ahora voy 4 dias a la semana. La app me dice exactamente que hacer.'},
+    {name:'Alejandro T.', age:16, stars:5, text:'El plan de comidas es increible. Me dice exactamente que comer y cuando. He bajado 3kg en un mes.'},
+    {name:'Pablo S.', age:22, stars:5, text:'Probe mil apps y esta es la unica que realmente te da un plan personalizado. Vale cada euro.'}
+  ];
+
+  var reviewsHtml = reviews.map(function(r) {
+    var stars = '';
+    for(var i=0;i<r.stars;i++) stars += '<span style="color:#fff;font-size:14px">★</span>';
+    return '<div style="background:#0f0f0f;border:1px solid #1f1f1f;border-radius:10px;padding:16px;flex-shrink:0;width:260px">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+      + '<div style="width:36px;height:36px;background:#222;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:16px;color:#fff">'+r.name[0]+'</div>'
+      + '<div><div style="font-size:13px;font-weight:700;color:#fff">'+r.name+'</div><div style="font-size:11px;color:#555">'+r.age+' anos</div></div>'
+      + '</div>'
+      + '<div style="margin-bottom:8px">'+stars+'</div>'
+      + '<div style="font-size:12px;color:#888;line-height:1.6">'+r.text+'</div>'
+      + '</div>';
+  }).join('');
+
+  var inner = document.createElement('div');
+  inner.style.cssText = 'background:#0a0a0a;border-top:1px solid #1f1f1f;border-radius:20px 20px 0 0;padding:0;width:100%;max-width:480px;margin:0 auto;';
+
+  inner.innerHTML =
+    '<div style="padding:28px 24px 0">'
+    + '<div style="width:40px;height:4px;background:#333;border-radius:2px;margin:0 auto 24px"></div>'
+    + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
+    + '<img src="logo.png" style="width:36px;height:36px;object-fit:contain;filter:invert(1)">'
+    + '<div style="font-family:Bebas Neue,sans-serif;font-size:28px">REPZERO PRO</div>'
     + '</div>'
-    + '<button id="pro-demo-btn" style="width:100%;background:#fff;color:#000;border:none;padding:18px;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:6px;font-family:Inter,sans-serif;margin-bottom:10px">Probar gratis ahora</button>'
-    + '<button id="pro-cancel-btn" style="width:100%;background:transparent;color:#555;border:none;padding:12px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Cancelar</button>';
+    + '<div style="color:#888;font-size:13px;line-height:1.7;margin-bottom:24px">Desbloquea tu plan de comidas 100% personalizado. Claude analiza exactamente lo que te gusta comer, cuanto tiempo tienes y tu objetivo.</div>'
+
+    + '<div style="display:flex;gap:6px;margin-bottom:8px">'
+    + '<div style="flex:1;border:1.5px solid #222;border-radius:10px;padding:16px;text-align:center">'
+    + '<div style="font-family:Bebas Neue,sans-serif;font-size:40px">8€</div>'
+    + '<div style="color:#555;font-size:10px;font-weight:700;letter-spacing:1px;margin-top:2px">POR MES</div>'
+    + '</div>'
+    + '<div style="flex:1;background:#fff;border-radius:10px;padding:16px;text-align:center;position:relative">'
+    + '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 10px;border-radius:10px">MAS POPULAR</div>'
+    + '<div style="font-family:Bebas Neue,sans-serif;font-size:40px;color:#000">99€</div>'
+    + '<div style="color:#333;font-size:10px;font-weight:700;letter-spacing:1px;margin-top:2px">POR AÑO</div>'
+    + '<div style="color:#555;font-size:10px">ahorra 37%</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;padding:16px 0;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a">'
+    + '<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#888"><span style="color:#fff;font-size:16px">✓</span> Plan de comidas 100% personalizado por IA</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#888"><span style="color:#fff;font-size:16px">✓</span> Adaptado a tus gustos y restricciones</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#888"><span style="color:#fff;font-size:16px">✓</span> Macros y calorias exactas por comida</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#888"><span style="color:#fff;font-size:16px">✓</span> Regenera tu plan cuando quieras</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="overflow-x:auto;padding:0 24px 20px;display:flex;gap:10px;scrollbar-width:none">'
+    + reviewsHtml
+    + '</div>'
+
+    + '<div style="padding:0 24px 48px">'
+    + '<button id="pro-demo-btn" style="width:100%;background:#fff;color:#000;border:none;padding:18px;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:Inter,sans-serif;margin-bottom:10px">Probar gratis</button>'
+    + '<button id="pro-cancel-btn" style="width:100%;background:transparent;color:#555;border:none;padding:12px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">No gracias</button>'
+    + '</div>';
+
   modal.appendChild(inner);
   document.body.appendChild(modal);
   document.getElementById('pro-demo-btn').onclick = window.activateProDemo;
   document.getElementById('pro-cancel-btn').onclick = function() { document.getElementById('pro-modal').remove(); };
+  modal.onclick = function(e) { if(e.target===modal) modal.remove(); };
 };
 
 window.activateProDemo = function() {
