@@ -263,6 +263,24 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
 .motivation-title { font-family:'Bebas Neue',sans-serif; font-size:26px; margin-bottom:6px; }
 .motivation-text { color:var(--text2); font-size:13px; line-height:1.7; }
 
+/* WORKOUT MODE */
+.wk-page { display:flex; flex-direction:column; height:100%; }
+.wk-header { padding:22px 22px 16px; max-width:480px; margin:0 auto; width:100%; flex-shrink:0; }
+.wk-progress-bar { height:2px; background:var(--line); border-radius:2px; margin:0 22px 0; max-width:436px; margin-left:auto; margin-right:auto; flex-shrink:0; }
+.wk-progress-fill { height:100%; background:var(--white); border-radius:2px; transition:width 0.4s; }
+.wk-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 22px; max-width:480px; margin:0 auto; width:100%; }
+.wk-ex-num { color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.wk-ex-name { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; text-align:center; margin-bottom:6px; }
+.wk-ex-machine { color:var(--text); font-size:12px; text-align:center; margin-bottom:6px; }
+.wk-ex-how { color:var(--text2); font-size:12px; line-height:1.6; text-align:center; margin-bottom:28px; max-width:320px; }
+.wk-sets-grid { display:flex; gap:8px; justify-content:center; margin-bottom:28px; flex-wrap:wrap; }
+.wk-set-btn { width:52px; height:52px; border:1.5px solid var(--line); border-radius:8px; background:var(--dark); color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; }
+.wk-set-btn.done { background:var(--white); border-color:var(--white); color:var(--black); }
+.wk-rest-timer { background:var(--dark); border:1px solid var(--line); border-radius:12px; padding:18px 28px; text-align:center; min-width:180px; display:none; margin-bottom:16px; }
+.wk-rest-val { font-family:'Bebas Neue',sans-serif; font-size:56px; line-height:1; }
+.wk-rest-lbl { color:var(--text); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+.wk-footer { padding:16px 22px 48px; max-width:480px; margin:0 auto; width:100%; flex-shrink:0; }
+
 /* PERFIL TAB */
 .profile-hdr { text-align:center; padding:28px 0 24px; border-bottom:1px solid var(--line); margin-bottom:24px; }
 .profile-avatar-wrap { position:relative; width:80px; margin:0 auto 14px; }
@@ -695,7 +713,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
       <div class="workout-meta" id="h-workout-meta">-</div>
     </div>
     <div id="h-exercises"></div>
-    <button class="start-btn" id="h-cta" style="display:none">Empezar entreno</button>
+    <button class="start-btn" id="h-cta" style="display:none" onclick="startWorkout()">Empezar entreno</button>
 
     <!-- Tip -->
     <div class="tip-card" id="h-tip-card" style="display:none">
@@ -782,8 +800,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
     <div style="font-family:'Bebas Neue',sans-serif;font-size:46px;margin-bottom:4px;margin-top:28px">PROGRESO</div>
     <div style="color:var(--text2);font-size:12px;margin-bottom:24px">Lleva el control de tu avance</div>
     <div class="prog-big-grid">
-      <div class="prog-big"><div class="prog-big-val">1</div><div class="prog-big-lbl">Sesiones</div></div>
-      <div class="prog-big"><div class="prog-big-val">1</div><div class="prog-big-lbl">Dias seguidos</div></div>
+      <div class="prog-big"><div class="prog-big-val" id="pg-sessions">0</div><div class="prog-big-lbl">Sesiones</div></div>
+      <div class="prog-big"><div class="prog-big-val" id="pg-streak">0</div><div class="prog-big-lbl">Dias seguidos</div></div>
       <div class="prog-big"><div class="prog-big-val" id="pg-weight-val">-</div><div class="prog-big-lbl">Peso actual</div></div>
       <div class="prog-big"><div class="prog-big-val" id="pg-bmi-val">-</div><div class="prog-big-lbl">IMC</div></div>
     </div>
@@ -793,7 +811,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
       <div class="prog-goal-text" id="pg-week-goal">-</div>
       <div class="prog-bar-wrap"><div class="prog-bar-fill" id="pg-bar" style="width:33%"></div></div>
       <div class="prog-bar-nums">
-        <div><div class="prog-num">1</div><div class="prog-num-lbl">Completados</div></div>
+        <div><div class="prog-num" id="pg-completed">0</div><div class="prog-num-lbl">Completados</div></div>
         <div style="text-align:right"><div class="prog-num" id="pg-total">3</div><div class="prog-num-lbl">Esta semana</div></div>
       </div>
     </div>
@@ -911,6 +929,36 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
     </div>
   </div>
   <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="generateMealPlan()">Generar mi plan de comidas</button></div></div>
+</div>
+
+<!-- ═══ WORKOUT MODE ═══ -->
+<div class="page" id="p-workout">
+  <div class="wk-page">
+    <div class="wk-header">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <button style="background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--text);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;cursor:pointer" onclick="exitWorkout()">Salir</button>
+        <div style="color:var(--text);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase" id="wk-counter">1 / 1</div>
+      </div>
+      <div class="wk-progress-bar"><div class="wk-progress-fill" id="wk-prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="wk-body">
+      <div class="wk-ex-num" id="wk-ex-num">Ejercicio 1</div>
+      <div class="wk-ex-name" id="wk-ex-name">-</div>
+      <div class="wk-ex-machine" id="wk-ex-machine"></div>
+      <div class="wk-ex-how" id="wk-ex-how"></div>
+      <div class="wk-rest-timer" id="wk-rest-timer">
+        <div class="wk-rest-val" id="wk-rest-val">60</div>
+        <div class="wk-rest-lbl">Descanso</div>
+        <div style="color:var(--text2);font-size:11px;margin-top:4px">Toca para saltar</div>
+      </div>
+      <div class="wk-sets-grid" id="wk-sets-grid"></div>
+      <div style="color:var(--text);font-size:11px;text-align:center;margin-top:4px" id="wk-sets-lbl"></div>
+    </div>
+    <div class="wk-footer">
+      <button class="btn" id="wk-next-btn" onclick="wkNext()">Siguiente ejercicio</button>
+      <button class="btn-ghost" onclick="wkSkip()">Saltar ejercicio</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ GENERANDO COMIDAS ═══ -->
@@ -1145,20 +1193,28 @@ function loadHome(profile) {
   // Header
   document.getElementById('h-greeting').textContent = getGreeting();
   document.getElementById('h-name').textContent = profile.name || 'Usuario';
-  document.getElementById('h-quote').textContent = plan.quote || 'Empieza hoy. Sin excusas.';
   document.getElementById('h-date').textContent = 'RepZero — ' + today.toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
+  // Quote: show cached immediately, then refresh if stale
+  var cachedQ = null;
+  try { cachedQ = JSON.parse(localStorage.getItem('rz_quote') || 'null'); } catch(e) {}
+  if (cachedQ && cachedQ.quote) {
+    document.getElementById('h-quote').textContent = cachedQ.quote;
+    if (cachedQ.tip) { document.getElementById('h-tip-card').style.display='block'; document.getElementById('h-tip').textContent = cachedQ.tip; }
+  } else {
+    document.getElementById('h-quote').textContent = plan.quote || 'Empieza hoy. Sin excusas.';
+  }
+  if (!cachedQ || cachedQ.date !== today.toDateString()) {
+    getOrRefreshQuote(plan).then(function(q) {
+      if (q && q.quote) document.getElementById('h-quote').textContent = q.quote;
+      if (q && q.tip) { document.getElementById('h-tip-card').style.display='block'; document.getElementById('h-tip').textContent = q.tip; }
+    });
+  }
 
   // Daily summary
   document.getElementById('h-cals').textContent = plan.dailyCalories || '-';
   document.getElementById('h-protein').textContent = (plan.dailyProtein||'-')+'g';
   document.getElementById('h-water-goal').textContent = plan.dailyWater || '2.5';
   document.getElementById('h-steps').textContent = plan.dailySteps ? (plan.dailySteps/1000).toFixed(0)+'k' : '8k';
-
-  // Tip
-  if (plan.tip) {
-    document.getElementById('h-tip-card').style.display='block';
-    document.getElementById('h-tip').textContent = plan.tip;
-  }
 
   // Water
   waterGoal = Math.round((plan.dailyWater||2.5) * 4);
@@ -1296,15 +1352,23 @@ function loadHome(profile) {
   document.getElementById('pg-bmi-val').textContent = plan.bmi || '-';
   document.getElementById('pg-bmi-big').textContent = plan.bmi || '-';
   document.getElementById('pg-bmi-cat').textContent = plan.bmiCategory || '-';
-  // Highlight correct BMI segment: <18.5 bajo, 18.5-25 normal, 25-30 sobrepeso, >30 obesidad
   var bmiSegs = ['bmi-s1','bmi-s2','bmi-s3','bmi-s4'];
   var bmiIdx = bmi < 18.5 ? 0 : bmi < 25 ? 1 : bmi < 30 ? 2 : 3;
   bmiSegs.forEach(function(id,idx){ document.getElementById(id).style.background = idx===bmiIdx ? '#fff' : '#333'; });
   document.getElementById('pg-week-goal').textContent = plan.weeklyGoal || 'Completa tus entrenos esta semana';
   var totalDays = plan.weekPlan ? plan.weekPlan.length : 3;
   document.getElementById('pg-total').textContent = totalDays;
-  var pct = Math.round((1/totalDays)*100);
-  document.getElementById('pg-bar').style.width = pct + '%';
+  var sessions = calcSessions();
+  var streak = calcStreak();
+  var completed = calcWeeklyCompletions(plan);
+  var el = document.getElementById('pg-sessions');
+  if (el) el.textContent = sessions;
+  var el2 = document.getElementById('pg-streak');
+  if (el2) el2.textContent = streak;
+  var el3 = document.getElementById('pg-completed');
+  if (el3) el3.textContent = completed;
+  var pct = totalDays > 0 ? Math.round((completed / totalDays) * 100) : 0;
+  document.getElementById('pg-bar').style.width = Math.min(pct, 100) + '%';
 
   // Motivation based on goal
   const goal = profile.goal || '';
@@ -1422,9 +1486,26 @@ window.saveWeight = function() {
   if (saved) {
     const profile = JSON.parse(saved);
     profile.weight = parseFloat(newWeight);
+    const h = parseFloat(profile.height) / 100;
+    const newBmi = h > 0 ? (profile.weight / (h * h)).toFixed(1) : null;
+    if (newBmi && profile.plan) {
+      profile.plan.bmi = newBmi;
+      const bmiN = parseFloat(newBmi);
+      profile.plan.bmiCategory = bmiN < 18.5 ? 'Bajo peso' : bmiN < 25 ? 'Peso normal' : bmiN < 30 ? 'Sobrepeso' : 'Obesidad';
+    }
     localStorage.setItem('rz_plan', JSON.stringify(profile));
     document.getElementById('pf-weight').textContent = newWeight + ' kg';
     document.getElementById('weight-edit-wrap').style.display = 'none';
+    if (newBmi && profile.plan) {
+      document.getElementById('pg-weight-val').textContent = newWeight + 'kg';
+      document.getElementById('pg-bmi-val').textContent = newBmi;
+      document.getElementById('pg-bmi-big').textContent = newBmi;
+      document.getElementById('pg-bmi-cat').textContent = profile.plan.bmiCategory;
+      document.getElementById('pf-bmi').textContent = newBmi + ' — ' + profile.plan.bmiCategory;
+      var bN = parseFloat(newBmi);
+      var bmiIdx = bN < 18.5 ? 0 : bN < 25 ? 1 : bN < 30 ? 2 : 3;
+      ['bmi-s1','bmi-s2','bmi-s3','bmi-s4'].forEach(function(id,idx){ document.getElementById(id).style.background = idx===bmiIdx ? '#fff' : '#333'; });
+    }
   }
 };
 window.startPro = function() {
@@ -1521,8 +1602,15 @@ window.generateMealPlan = async function() {
   FD.nutrGoals = [...document.querySelectorAll('#nutr-goal .chip.sel')].map(c=>c.textContent).join(', ') || 'General';
   
   go('p-meal-gen');
-  const steps = ['mgs1','mgs2','mgs3','mgs4'];
-  for (let s of steps) { await delay(800); document.getElementById(s).classList.add('done'); }
+  const mealSteps = ['mgs1','mgs2','mgs3','mgs4'];
+  mealSteps.forEach(function(id){ document.getElementById(id).classList.remove('done'); });
+  let mealStepIdx = 0;
+  const mealTicker = setInterval(function() {
+    if (mealStepIdx < mealSteps.length - 1) {
+      document.getElementById(mealSteps[mealStepIdx]).classList.add('done');
+      mealStepIdx++;
+    }
+  }, 1100);
 
   const saved = localStorage.getItem('rz_plan');
   const profile = saved ? JSON.parse(saved) : {};
@@ -1544,6 +1632,10 @@ Incluye 4-5 comidas. Adapta TODO a sus preferencias. No incluyas alimentos que n
     const text = json.content[0].text;
     const mealData = JSON.parse(text.replace(/```json[\s\S]*?```/g, function(m){ return m.slice(7,-3); }).replace(/```/g,'').trim());
 
+    clearInterval(mealTicker);
+    mealSteps.forEach(function(id){ document.getElementById(id).classList.add('done'); });
+    await delay(300);
+
     // Save meal plan
     if (saved) {
       const p = JSON.parse(saved);
@@ -1562,6 +1654,7 @@ Incluye 4-5 comidas. Adapta TODO a sus preferencias. No incluyas alimentos que n
     go('p-home');
 
   } catch(e) {
+    clearInterval(mealTicker);
     console.error('Meal plan error:', e);
     go('p-home');
     showTab('nutricion');
@@ -1666,6 +1759,9 @@ window.logout = async function() {
   await SB.auth.signOut();
   localStorage.removeItem('rz_plan');
   localStorage.removeItem('rz_avatar');
+  localStorage.removeItem('rz_workouts');
+  localStorage.removeItem('rz_quote');
+  localStorage.removeItem('rz_pro');
   go('p-welcome');
 };
 window.goPro = function() {
@@ -1677,6 +1773,201 @@ window.resetPlan = function() {
   window.D = {};
   go('q1');
 };
+
+// ─── WORKOUT STATS ───
+function getWorkouts() {
+  try { return JSON.parse(localStorage.getItem('rz_workouts') || '[]'); } catch(e) { return []; }
+}
+function saveWorkout() {
+  var list = getWorkouts();
+  var ds = new Date().toDateString();
+  if (!list.includes(ds)) { list.push(ds); localStorage.setItem('rz_workouts', JSON.stringify(list)); }
+}
+function calcSessions() {
+  return getWorkouts().length;
+}
+function calcStreak() {
+  var list = getWorkouts();
+  if (!list.length) return 0;
+  var dates = list.map(function(s){ return new Date(s).toDateString(); });
+  var streak = 0;
+  var check = new Date();
+  while (true) {
+    if (dates.includes(check.toDateString())) {
+      streak++;
+      check.setDate(check.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+function calcWeeklyCompletions(plan) {
+  var list = getWorkouts();
+  var now = new Date();
+  var startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0,0,0,0);
+  return list.filter(function(s){
+    var d = new Date(s);
+    return d >= startOfWeek;
+  }).length;
+}
+
+// ─── DAILY QUOTE ───
+async function getOrRefreshQuote(plan) {
+  var today = new Date().toDateString();
+  try {
+    var cached = JSON.parse(localStorage.getItem('rz_quote') || 'null');
+    if (cached && cached.date === today && cached.quote) return cached;
+  } catch(e) {}
+  try {
+    var res = await fetch('https://repzero-api.crue9445.workers.dev/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:'Give a short motivational fitness quote in Spanish (under 20 words) and a practical gym tip in Spanish (under 30 words). Reply ONLY valid JSON: {"quote":"...","tip":"..."}', max_tokens:200})
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var json = await res.json();
+    var text = json.content[0].text;
+    var data = JSON.parse(text.replace(/```json[\s\S]*?```/g, function(m){ return m.slice(7,-3); }).replace(/```/g,'').trim());
+    var entry = {date: today, quote: data.quote || (plan && plan.quote) || '', tip: data.tip || (plan && plan.tip) || ''};
+    localStorage.setItem('rz_quote', JSON.stringify(entry));
+    return entry;
+  } catch(e) {
+    return {date: today, quote: (plan && plan.quote) || 'Empieza hoy. Sin excusas.', tip: (plan && plan.tip) || ''};
+  }
+}
+
+// ─── WORKOUT MODE ───
+var wkExercises = [];
+var wkCurrentIdx = 0;
+var wkRestTimer = null;
+var wkCurrentWorkout = null;
+
+window.startWorkout = function() {
+  var saved = localStorage.getItem('rz_plan');
+  if (!saved) return;
+  var profile = JSON.parse(saved);
+  var plan = profile.plan;
+  var todayW = plan.weekPlan ? plan.weekPlan.find(function(w){ return w.day === todayName; }) : null;
+  if (!todayW || !todayW.exercises || !todayW.exercises.length) return;
+  wkCurrentWorkout = todayW;
+  wkExercises = todayW.exercises;
+  wkCurrentIdx = 0;
+  go('p-workout');
+  renderWkExercise();
+};
+
+window.exitWorkout = function() {
+  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
+  go('p-home');
+};
+
+function renderWkExercise() {
+  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
+  document.getElementById('wk-rest-timer').style.display = 'none';
+  var total = wkExercises.length;
+  var idx = wkCurrentIdx;
+  var ex = wkExercises[idx];
+  var pct = Math.round((idx / total) * 100);
+  document.getElementById('wk-prog-fill').style.width = pct + '%';
+  document.getElementById('wk-counter').textContent = (idx+1) + ' / ' + total;
+  document.getElementById('wk-ex-num').textContent = 'Ejercicio ' + (idx+1);
+  document.getElementById('wk-ex-name').textContent = (ex.name || '').toUpperCase();
+  document.getElementById('wk-ex-machine').textContent = ex.machine || '';
+  document.getElementById('wk-ex-how').textContent = ex.howTo || '';
+  var grid = document.getElementById('wk-sets-grid');
+  grid.innerHTML = '';
+  var sets = parseInt(ex.sets) || 3;
+  for (var s = 0; s < sets; s++) {
+    var btn = document.createElement('button');
+    btn.className = 'wk-set-btn';
+    btn.textContent = s + 1;
+    var sIdx = s;
+    var restSec = parseInt(ex.rest) || 60;
+    btn.onclick = (function(b, rs) {
+      return function() {
+        b.classList.toggle('done');
+        if (b.classList.contains('done')) startRestTimer(rs);
+      };
+    })(btn, restSec);
+    grid.appendChild(btn);
+  }
+  document.getElementById('wk-sets-lbl').textContent = sets + ' series x ' + (ex.reps || 10) + ' reps — ' + (ex.rest || 60) + 's descanso';
+  var isLast = (idx === total - 1);
+  document.getElementById('wk-next-btn').textContent = isLast ? 'Completar entreno' : 'Siguiente ejercicio';
+}
+
+function startRestTimer(seconds) {
+  if (wkRestTimer) clearInterval(wkRestTimer);
+  var remaining = seconds;
+  var timerEl = document.getElementById('wk-rest-timer');
+  var valEl = document.getElementById('wk-rest-val');
+  timerEl.style.display = 'block';
+  valEl.textContent = remaining;
+  timerEl.onclick = function() {
+    clearInterval(wkRestTimer);
+    wkRestTimer = null;
+    timerEl.style.display = 'none';
+  };
+  wkRestTimer = setInterval(function() {
+    remaining--;
+    valEl.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(wkRestTimer);
+      wkRestTimer = null;
+      timerEl.style.display = 'none';
+    }
+  }, 1000);
+}
+
+window.wkNext = function() {
+  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
+  var total = wkExercises.length;
+  if (wkCurrentIdx >= total - 1) {
+    finishWorkout();
+  } else {
+    wkCurrentIdx++;
+    renderWkExercise();
+  }
+};
+
+window.wkSkip = function() {
+  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
+  var total = wkExercises.length;
+  if (wkCurrentIdx >= total - 1) {
+    finishWorkout();
+  } else {
+    wkCurrentIdx++;
+    renderWkExercise();
+  }
+};
+
+function finishWorkout() {
+  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
+  saveWorkout();
+  go('p-home');
+  showTab('progreso');
+  var sessions = calcSessions();
+  var streak = calcStreak();
+  var el = document.getElementById('pg-sessions');
+  if (el) el.textContent = sessions;
+  var el2 = document.getElementById('pg-streak');
+  if (el2) el2.textContent = streak;
+  var saved = localStorage.getItem('rz_plan');
+  if (saved) {
+    var profile = JSON.parse(saved);
+    var plan = profile.plan;
+    var totalDays = plan && plan.weekPlan ? plan.weekPlan.length : 3;
+    var completed = calcWeeklyCompletions(plan);
+    var el3 = document.getElementById('pg-completed');
+    if (el3) el3.textContent = completed;
+    var el4 = document.getElementById('pg-total');
+    if (el4) el4.textContent = totalDays;
+    var pct = totalDays > 0 ? Math.round((completed / totalDays) * 100) : 0;
+    var barEl = document.getElementById('pg-bar');
+    if (barEl) barEl.style.width = Math.min(pct, 100) + '%';
+  }
+}
 
 function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 
