@@ -130,16 +130,14 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
 .day-cell { flex-shrink:0; width:44px; padding:9px 0; text-align:center; border-radius:6px; cursor:pointer; border:1px solid transparent; transition:all 0.15s; }
 .day-cell:hover { border-color:var(--line); }
 .day-cell.today { background:var(--white); }
-.day-cell.has-workout { border-color:#2a2a2a; background:var(--dark); }
+.day-cell.has-workout { border-color:var(--line); }
 .day-n { font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--text); }
 .day-d { font-size:17px; font-weight:700; color:var(--text); margin-top:3px; }
-.day-dot { width:4px; height:4px; background:var(--text2); border-radius:50%; margin:4px auto 0; }
 .day-cell.today .day-n,.day-cell.today .day-d { color:var(--black); }
-.day-cell.today .day-dot { background:var(--black); }
-.day-cell.selected:not(.today) { border-color:#555; background:#111; }
+.day-cell.selected:not(.today) { border-color:#444; }
 .day-cell.selected:not(.today) .day-n,.day-cell.selected:not(.today) .day-d { color:var(--white); }
-.day-cell.has-workout .day-n { color:#aaa; }
-.day-cell.has-workout .day-d { color:#aaa; }
+.day-cell.has-workout .day-n { color:#888; }
+.day-cell.has-workout .day-d { color:#888; }
 
 /* DAILY SUMMARY */
 .daily-summary { background:var(--dark); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:32px; }
@@ -262,24 +260,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
 .motivation-card { background:var(--dark); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:10px; }
 .motivation-title { font-family:'Bebas Neue',sans-serif; font-size:26px; margin-bottom:6px; }
 .motivation-text { color:var(--text2); font-size:13px; line-height:1.7; }
-
-/* WORKOUT MODE */
-.wk-page { display:flex; flex-direction:column; height:100%; }
-.wk-header { padding:22px 22px 16px; max-width:480px; margin:0 auto; width:100%; flex-shrink:0; }
-.wk-progress-bar { height:2px; background:var(--line); border-radius:2px; margin:0 22px 0; max-width:436px; margin-left:auto; margin-right:auto; flex-shrink:0; }
-.wk-progress-fill { height:100%; background:var(--white); border-radius:2px; transition:width 0.4s; }
-.wk-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 22px; max-width:480px; margin:0 auto; width:100%; }
-.wk-ex-num { color:var(--text); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
-.wk-ex-name { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; text-align:center; margin-bottom:6px; }
-.wk-ex-machine { color:var(--text); font-size:12px; text-align:center; margin-bottom:6px; }
-.wk-ex-how { color:var(--text2); font-size:12px; line-height:1.6; text-align:center; margin-bottom:28px; max-width:320px; }
-.wk-sets-grid { display:flex; gap:8px; justify-content:center; margin-bottom:28px; flex-wrap:wrap; }
-.wk-set-btn { width:52px; height:52px; border:1.5px solid var(--line); border-radius:8px; background:var(--dark); color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; }
-.wk-set-btn.done { background:var(--white); border-color:var(--white); color:var(--black); }
-.wk-rest-timer { background:var(--dark); border:1px solid var(--line); border-radius:12px; padding:18px 28px; text-align:center; min-width:180px; display:none; margin-bottom:16px; }
-.wk-rest-val { font-family:'Bebas Neue',sans-serif; font-size:56px; line-height:1; }
-.wk-rest-lbl { color:var(--text); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
-.wk-footer { padding:16px 22px 48px; max-width:480px; margin:0 auto; width:100%; flex-shrink:0; }
 
 /* PERFIL TAB */
 .profile-hdr { text-align:center; padding:28px 0 24px; border-bottom:1px solid var(--line); margin-bottom:24px; }
@@ -646,10 +626,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
       <div class="gstep" id="gs5"><div class="sdot"></div><div class="stxt">Generando plan de comidas</div></div>
       <div class="gstep" id="gs6"><div class="sdot"></div><div class="stxt">Finalizando tu plan unico</div></div>
     </div>
-    <div id="gen-error" style="display:none;margin-top:32px;width:100%">
-      <div style="color:#ff5555;font-size:13px;margin-bottom:16px" id="gen-err-msg">Error al conectar con la IA.</div>
-      <button class="btn" onclick="retryGenerate()">Intentar de nuevo</button>
-    </div>
   </div>
 </div>
 
@@ -811,7 +787,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
       <div class="prog-goal-text" id="pg-week-goal">-</div>
       <div class="prog-bar-wrap"><div class="prog-bar-fill" id="pg-bar" style="width:33%"></div></div>
       <div class="prog-bar-nums">
-        <div><div class="prog-num" id="pg-completed">0</div><div class="prog-num-lbl">Completados</div></div>
+        <div><div class="prog-num" id="pg-this-week">0</div><div class="prog-num-lbl">Completados</div></div>
         <div style="text-align:right"><div class="prog-num" id="pg-total">3</div><div class="prog-num-lbl">Esta semana</div></div>
       </div>
     </div>
@@ -824,11 +800,11 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
     <div class="bmi-card">
       <div class="bmi-val" id="pg-bmi-big">-</div>
       <div class="bmi-cat" id="pg-bmi-cat">-</div>
-      <div class="bmi-bar" id="bmi-bar-wrap">
-        <div class="bmi-seg" id="bmi-s1" style="background:#333"></div>
-        <div class="bmi-seg" id="bmi-s2" style="background:#333"></div>
-        <div class="bmi-seg" id="bmi-s3" style="background:#333"></div>
-        <div class="bmi-seg" id="bmi-s4" style="background:#333"></div>
+      <div class="bmi-bar">
+        <div class="bmi-seg" style="background:#555"></div>
+        <div class="bmi-seg" style="background:#777"></div>
+        <div class="bmi-seg" style="background:#999" id="bmi-active"></div>
+        <div class="bmi-seg" style="background:#555"></div>
       </div>
     </div>
   </div>
@@ -931,36 +907,6 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
   <div class="btn-wrap"><div class="wrap"><button class="btn" onclick="generateMealPlan()">Generar mi plan de comidas</button></div></div>
 </div>
 
-<!-- ═══ WORKOUT MODE ═══ -->
-<div class="page" id="p-workout">
-  <div class="wk-page">
-    <div class="wk-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <button style="background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--text);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;cursor:pointer" onclick="exitWorkout()">Salir</button>
-        <div style="color:var(--text);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase" id="wk-counter">1 / 1</div>
-      </div>
-      <div class="wk-progress-bar"><div class="wk-progress-fill" id="wk-prog-fill" style="width:0%"></div></div>
-    </div>
-    <div class="wk-body">
-      <div class="wk-ex-num" id="wk-ex-num">Ejercicio 1</div>
-      <div class="wk-ex-name" id="wk-ex-name">-</div>
-      <div class="wk-ex-machine" id="wk-ex-machine"></div>
-      <div class="wk-ex-how" id="wk-ex-how"></div>
-      <div class="wk-rest-timer" id="wk-rest-timer">
-        <div class="wk-rest-val" id="wk-rest-val">60</div>
-        <div class="wk-rest-lbl">Descanso</div>
-        <div style="color:var(--text2);font-size:11px;margin-top:4px">Toca para saltar</div>
-      </div>
-      <div class="wk-sets-grid" id="wk-sets-grid"></div>
-      <div style="color:var(--text);font-size:11px;text-align:center;margin-top:4px" id="wk-sets-lbl"></div>
-    </div>
-    <div class="wk-footer">
-      <button class="btn" id="wk-next-btn" onclick="wkNext()">Siguiente ejercicio</button>
-      <button class="btn-ghost" onclick="wkSkip()">Saltar ejercicio</button>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ GENERANDO COMIDAS ═══ -->
 <div class="page" id="p-meal-gen">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;text-align:center;max-width:480px;margin:0 auto;width:100%">
@@ -972,6 +918,78 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:26px; h
       <div class="gstep" id="mgs3"><div class="sdot"></div><div class="stxt">Creando comidas personalizadas</div></div>
       <div class="gstep" id="mgs4"><div class="sdot"></div><div class="stxt">Ajustando a tus restricciones</div></div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ WORKOUT MODE ═══ -->
+<div class="page" id="p-workout">
+  <div style="flex:1;display:flex;flex-direction:column;max-width:480px;margin:0 auto;width:100%;padding:0">
+
+    <!-- Header -->
+    <div style="padding:24px 22px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <button onclick="exitWorkout()" style="background:var(--dark);border:1px solid var(--line);border-radius:50%;width:40px;height:40px;color:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px" id="wm-title">ENTRENO</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text)" id="wm-progress">1/4</div>
+    </div>
+
+    <!-- Exercise name -->
+    <div style="padding:28px 22px 0;flex-shrink:0">
+      <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px" id="wm-ex-num">Ejercicio 1</div>
+      <div style="font-family:Bebas Neue,sans-serif;font-size:42px;line-height:1;margin-bottom:4px" id="wm-ex-name">-</div>
+      <div style="color:var(--text);font-size:12px;margin-bottom:20px" id="wm-ex-machine">-</div>
+      <div style="background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Como hacerlo</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--white)" id="wm-howto">-</div>
+      </div>
+      <div id="wm-tips-wrap" style="background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:20px;display:none">
+        <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Consejo</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--text)" id="wm-tips">-</div>
+      </div>
+    </div>
+
+    <!-- Sets tracker -->
+    <div style="padding:0 22px;flex:1">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase">Series</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--text)" id="wm-sets-info">3 x 10 reps</div>
+      </div>
+      <div id="wm-sets-list" style="display:flex;flex-direction:column;gap:8px"></div>
+
+      <!-- Rest timer -->
+      <div id="wm-rest-wrap" style="display:none;margin-top:20px;background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:20px;text-align:center">
+        <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Descansando</div>
+        <div style="font-family:Bebas Neue,sans-serif;font-size:64px;line-height:1" id="wm-timer">60</div>
+        <div style="color:var(--text);font-size:12px;margin-top:4px">segundos</div>
+        <button onclick="skipRest()" style="margin-top:16px;background:transparent;border:1px solid var(--line);color:var(--text);padding:10px 20px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:Inter,sans-serif">Saltar descanso</button>
+      </div>
+    </div>
+
+    <!-- Bottom buttons -->
+    <div style="padding:20px 22px 40px;flex-shrink:0">
+      <button id="wm-next-btn" onclick="nextExercise()" style="width:100%;background:var(--white);color:var(--black);border:none;padding:20px;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:Inter,sans-serif">Siguiente ejercicio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WORKOUT DONE ═══ -->
+<div class="page" id="p-workout-done">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;text-align:center;max-width:480px;margin:0 auto;width:100%">
+    <img src="logo.png" style="width:56px;height:56px;object-fit:contain;filter:invert(1);margin-bottom:24px" alt="RZ">
+    <div style="font-family:Bebas Neue,sans-serif;font-size:56px;line-height:1;margin-bottom:8px">ENTRENO<br>COMPLETADO</div>
+    <div style="color:var(--text);font-size:14px;margin-bottom:40px;line-height:1.6" id="done-stats">Buen trabajo.</div>
+    <div style="background:var(--dark);border:1px solid var(--line);border-radius:10px;padding:20px;width:100%;margin-bottom:32px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="text-align:center">
+          <div style="font-family:Bebas Neue,sans-serif;font-size:40px" id="done-sessions">-</div>
+          <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px">Sesiones totales</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:Bebas Neue,sans-serif;font-size:40px" id="done-streak">-</div>
+          <div style="color:var(--text);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px">Dias seguidos</div>
+        </div>
+      </div>
+    </div>
+    <button onclick="finishWorkout()" style="width:100%;background:var(--white);color:var(--black);border:none;padding:20px;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:Inter,sans-serif">Volver al inicio</button>
   </div>
 </div>
 
@@ -1110,81 +1128,54 @@ window.handleAuth = async function() {
 };
 
 // ─── GENERATE PLAN ───
-let lastGenerateAttempt = null;
-
-function buildPlanPrompt(d) {
-  const imc = (parseFloat(d.weight)/((parseFloat(d.height)/100)**2)).toFixed(1);
-  const calNote = (d.goal||'').toLowerCase().includes('perder') ? 'Deficit calorico de 350kcal.' : (d.goal||'').toLowerCase().includes('musculo') ? 'Superavit de 250kcal.' : 'Calorias de mantenimiento.';
-  return 'Crea un plan de gym y nutricion en JSON para una persona con estos datos: Nombre:' + d.name + ', Edad:' + d.age + ', Sexo:' + (d.gender||'Hombre') + ', Peso:' + d.weight + 'kg, Altura:' + d.height + 'cm, IMC:' + imc + '. Objetivo principal:' + (d.goal||'Ganar musculo') + '. Nivel de gym:' + (d.level||'Principiante') + '. Dias de entreno EXACTOS (usa solo estos):' + (d.days||'Lunes, Miercoles, Viernes') + '. Duracion por sesion:' + (d.sessionTime||'45min') + '. Partes del cuerpo a mejorar:' + (d.bodyParts||'Todo el cuerpo') + '. Lesiones o limitaciones:' + (d.injury||'Ninguna') + '. Dieta:' + (d.diet||'Equilibrada') + '. Alergias:' + (d.allergies||'Ninguna') + '. Horas de sueno:' + (d.sleep||'7-8 horas') + '. Objetivos adicionales:' + (d.extraGoals||'Ninguno') + '. ' + calNote + ' IMPORTANTE: en weekPlan incluye UNICAMENTE estos dias exactos: ' + (d.days||'Lunes, Miercoles, Viernes') + '. Devuelve SOLO JSON valido sin markdown ni explicacion, con esta estructura exacta: {"weekPlan":[{"day":"Lunes","focus":"Pecho y Triceps","duration":45,"exercises":[{"name":"Press de banca","machine":"Maquina Smith","sets":3,"reps":10,"rest":60,"howTo":"Descripcion breve de ejecucion correcta.","tips":"Consejo clave de seguridad o rendimiento."}],"cardio":{"include":false,"type":"","duration":0,"intensity":""}}],"restDays":["Martes","Jueves","Sabado","Domingo"],"mealPlan":[{"meal":"Desayuno","time":"8:00","foods":["Avena 80g con leche semidesnatada","Platano mediano"],"calories":420,"protein":22,"carbs":68,"fat":7}],"dailyCalories":2200,"dailyProtein":160,"dailyCarbs":220,"dailyFat":70,"dailyWater":2.5,"dailySteps":8000,"cardioWeekly":{"type":"Cinta de correr","duration":20,"frequency":"2 veces por semana","intensity":"Moderada — 65% FCmax"},"quote":"Frase motivacional corta y potente en espanol.","tip":"Consejo practico de entrenamiento o nutricion.","weeklyGoal":"Descripcion del objetivo de esta semana.","motivation":{"title":"TITULO EN MAYUSCULAS","text":"Texto motivacional personalizado al objetivo del usuario."},"bmi":' + imc + ',"bmiCategory":"Peso normal"}';
-}
-
 window.generatePlan = async function() {
-  D.source = document.querySelector('#q13 .opt.sel .on') ? document.querySelector('#q13 .opt.sel .on').textContent : 'Otro';
+  D.source = document.querySelector('#q13 .opt.sel .on')?.textContent || 'Otro';
   go('p-gen');
-  document.getElementById('gen-error').style.display = 'none';
-  ['gs1','gs2','gs3','gs4','gs5','gs6'].forEach(function(id) {
-    document.getElementById(id).classList.remove('done');
-  });
-  lastGenerateAttempt = Object.assign({}, D);
-  await runGeneratePlan();
-};
+  const steps = ['gs1','gs2','gs3','gs4','gs5','gs6'];
+  for (let s of steps) { await delay(900); document.getElementById(s).classList.add('done'); }
 
-window.retryGenerate = function() {
-  document.getElementById('gen-error').style.display = 'none';
-  ['gs1','gs2','gs3','gs4','gs5','gs6'].forEach(function(id) {
-    document.getElementById(id).classList.remove('done');
-  });
-  runGeneratePlan();
-};
+  const imc = (parseFloat(D.weight)/((parseFloat(D.height)/100)**2)).toFixed(1);
 
-async function runGeneratePlan() {
-  const d = lastGenerateAttempt || D;
-  const stepIds = ['gs1','gs2','gs3','gs4','gs5','gs6'];
-  let stepIdx = 0;
+  const prompt = `Crea un plan de gym y nutricion en JSON para: ${D.name}, ${D.age}a, ${D.gender||'H'}, ${D.weight}kg, ${D.height}cm, IMC:${imc}. Objetivo:${D.goal||'Ganar musculo'}. Nivel:${D.level||'Principiante'}. Dias de entreno exactos:${D.days||'Lunes, Miercoles, Viernes'}. Tiempo:${D.sessionTime||'45min'}. Lesion:${D.injury||'No'}. Dieta:${D.diet||'Equilibrada'}. Alergias:${D.allergies||'No'}. Sueno:${D.sleep||'7h'}.
 
-  const ticker = setInterval(function() {
-    if (stepIdx < stepIds.length - 1) {
-      document.getElementById(stepIds[stepIdx]).classList.add('done');
-      stepIdx++;
-    }
-  }, 900);
+JSON SOLO, sin markdown:
+{"weekPlan":[{"day":"Lunes","focus":"Pecho","duration":45,"exercises":[{"name":"Press banca","machine":"Smith","sets":3,"reps":10,"rest":60,"howTo":"Descripcion breve.","tips":"Tip breve."}],"cardio":{"include":false}}],"restDays":["Martes"],"mealPlan":[{"meal":"Desayuno","time":"8:00","foods":["Avena 80g","Platano"],"calories":420,"protein":22,"carbs":68,"fat":7}],"dailyCalories":2200,"dailyProtein":160,"dailyCarbs":220,"dailyFat":70,"dailyWater":2.5,"dailySteps":8000,"cardioWeekly":{"type":"Cinta","duration":20,"frequency":"2x semana","intensity":"Moderada"},"quote":"Frase corta.","tip":"Consejo.","weeklyGoal":"Objetivo semana.","motivation":{"title":"Titulo","text":"Texto motivacional."},"bmi":${imc},"bmiCategory":"Normal"}
+
+Adapta TODO al perfil. ${D.goal?.includes('perder')?'Deficit 350kcal.':''} ${D.goal?.includes('musculo')?'Supravit 250kcal.':''} Max 4 ejercicios/dia. En weekPlan usa EXACTAMENTE estos dias: ${D.days||'Lunes, Miercoles, Viernes'}.`;
 
   try {
-    const prompt = buildPlanPrompt(d);
     const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt, max_tokens: 8000})
+      body:JSON.stringify({prompt})
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     const text = json.content[0].text;
-    const plan = JSON.parse(text.replace(/```json[\s\S]*?```/g, function(m){ return m.slice(7,-3); }).replace(/```/g,'').trim());
-
-    clearInterval(ticker);
-    for (let s of stepIds) { document.getElementById(s).classList.add('done'); }
-    await delay(400);
+    const plan = JSON.parse(text.replace(/```json|```/g,'').trim());
 
     const {data:{user}} = await SB.auth.getUser();
     if (user) {
       await SB.from('repzero_profiles').upsert({
-        user_id:user.id, name:d.name, age:parseInt(d.age),
-        weight:parseFloat(d.weight), height:parseFloat(d.height),
-        goal:d.goal, level:d.level, days_per_week:d.days,
-        diet:d.diet, source:d.source, plan
+        user_id:user.id, name:D.name, age:parseInt(D.age),
+        weight:parseFloat(D.weight), height:parseFloat(D.height),
+        goal:D.goal, level:D.level, days_per_week:D.days,
+        diet:D.diet, source:D.source, plan
       });
     }
-    const profile = Object.assign({}, d, {plan});
+    const profile = {...D, plan};
     localStorage.setItem('rz_plan', JSON.stringify(profile));
     loadHome(profile);
     go('p-home');
   } catch(e) {
-    clearInterval(ticker);
-    console.error('Plan generation error:', e);
-    document.getElementById('gen-err-msg').textContent = 'No se pudo generar el plan. Comprueba tu conexion e intentalo de nuevo.';
-    document.getElementById('gen-error').style.display = 'block';
+    console.error('Error generating plan:', e);
+    // Show error to user temporarily
+    alert('Error: ' + e.message + ' — usando plan de respaldo');
+    const profile = {...D, plan: fallbackPlan()};
+    localStorage.setItem('rz_plan', JSON.stringify(profile));
+    loadHome(profile);
+    go('p-home');
   }
-}
+};
 
 // ─── LOAD HOME ───
 function loadHome(profile) {
@@ -1193,28 +1184,20 @@ function loadHome(profile) {
   // Header
   document.getElementById('h-greeting').textContent = getGreeting();
   document.getElementById('h-name').textContent = profile.name || 'Usuario';
+  document.getElementById('h-quote').textContent = plan.quote || 'Empieza hoy. Sin excusas.';
   document.getElementById('h-date').textContent = 'RepZero — ' + today.toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
-  // Quote: show cached immediately, then refresh if stale
-  var cachedQ = null;
-  try { cachedQ = JSON.parse(localStorage.getItem('rz_quote') || 'null'); } catch(e) {}
-  if (cachedQ && cachedQ.quote) {
-    document.getElementById('h-quote').textContent = cachedQ.quote;
-    if (cachedQ.tip) { document.getElementById('h-tip-card').style.display='block'; document.getElementById('h-tip').textContent = cachedQ.tip; }
-  } else {
-    document.getElementById('h-quote').textContent = plan.quote || 'Empieza hoy. Sin excusas.';
-  }
-  if (!cachedQ || cachedQ.date !== today.toDateString()) {
-    getOrRefreshQuote(plan).then(function(q) {
-      if (q && q.quote) document.getElementById('h-quote').textContent = q.quote;
-      if (q && q.tip) { document.getElementById('h-tip-card').style.display='block'; document.getElementById('h-tip').textContent = q.tip; }
-    });
-  }
 
   // Daily summary
   document.getElementById('h-cals').textContent = plan.dailyCalories || '-';
   document.getElementById('h-protein').textContent = (plan.dailyProtein||'-')+'g';
   document.getElementById('h-water-goal').textContent = plan.dailyWater || '2.5';
   document.getElementById('h-steps').textContent = plan.dailySteps ? (plan.dailySteps/1000).toFixed(0)+'k' : '8k';
+
+  // Tip
+  if (plan.tip) {
+    document.getElementById('h-tip-card').style.display='block';
+    document.getElementById('h-tip').textContent = plan.tip;
+  }
 
   // Water
   waterGoal = Math.round((plan.dailyWater||2.5) * 4);
@@ -1234,7 +1217,7 @@ function loadHome(profile) {
     var cell = document.createElement('div');
     var cls = 'day-cell';
     if (isToday) cls += ' today selected';
-    if (hasWorkout) cls += ' has-workout';
+    if (hasWorkout && !isToday) cls += ' has-workout';
     cell.className = cls;
     var nameDiv = document.createElement('div');
     nameDiv.className = 'day-n';
@@ -1242,29 +1225,28 @@ function loadHome(profile) {
     var numDiv = document.createElement('div');
     numDiv.className = 'day-d';
     numDiv.textContent = d.getDate();
+    // Show dot under training days
+    if (hasWorkout && !isToday) {
+      numDiv.style.borderBottom = '2px solid #555';
+    }
     cell.appendChild(nameDiv);
     cell.appendChild(numDiv);
-    if (hasWorkout) {
-      var dotEl = document.createElement('div');
-      dotEl.className = 'day-dot';
-      cell.appendChild(dotEl);
-    }
     (function(dn, c) {
       c.onclick = function() {
         document.querySelectorAll('.day-cell').forEach(function(x){x.classList.remove('selected');});
         c.classList.add('selected');
         var w = plan.weekPlan && plan.weekPlan.find(function(x){return x.day===dn;});
-        if (w) { renderWorkout(w, dn); }
-        else showRestDay(dn);
+        if (w) renderWorkout(w);
+        else showRestDay();
       };
     })(dayName, cell);
     strip.appendChild(cell);
   }
 
   // Today workout
-  const todayW = plan.weekPlan ? plan.weekPlan.find(function(w){return w.day===todayName;}) : null;
-  if (todayW) renderWorkout(todayW, todayName);
-  else showRestDay(todayName);
+  const todayW = plan.weekPlan?.find(w=>w.day===todayName);
+  if (todayW) renderWorkout(todayW);
+  else showRestDay();
 
   // PLAN TAB
   var planSub = document.getElementById('plan-sub');
@@ -1352,23 +1334,8 @@ function loadHome(profile) {
   document.getElementById('pg-bmi-val').textContent = plan.bmi || '-';
   document.getElementById('pg-bmi-big').textContent = plan.bmi || '-';
   document.getElementById('pg-bmi-cat').textContent = plan.bmiCategory || '-';
-  var bmiSegs = ['bmi-s1','bmi-s2','bmi-s3','bmi-s4'];
-  var bmiIdx = bmi < 18.5 ? 0 : bmi < 25 ? 1 : bmi < 30 ? 2 : 3;
-  bmiSegs.forEach(function(id,idx){ document.getElementById(id).style.background = idx===bmiIdx ? '#fff' : '#333'; });
   document.getElementById('pg-week-goal').textContent = plan.weeklyGoal || 'Completa tus entrenos esta semana';
-  var totalDays = plan.weekPlan ? plan.weekPlan.length : 3;
-  document.getElementById('pg-total').textContent = totalDays;
-  var sessions = calcSessions();
-  var streak = calcStreak();
-  var completed = calcWeeklyCompletions(plan);
-  var el = document.getElementById('pg-sessions');
-  if (el) el.textContent = sessions;
-  var el2 = document.getElementById('pg-streak');
-  if (el2) el2.textContent = streak;
-  var el3 = document.getElementById('pg-completed');
-  if (el3) el3.textContent = completed;
-  var pct = totalDays > 0 ? Math.round((completed / totalDays) * 100) : 0;
-  document.getElementById('pg-bar').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('pg-total').textContent = plan.weekPlan?.length || 3;
 
   // Motivation based on goal
   const goal = profile.goal || '';
@@ -1404,9 +1371,7 @@ function loadHome(profile) {
   document.getElementById('pf-bmi').textContent = plan.bmi ? plan.bmi + ' — ' + (plan.bmiCategory||'') : '-';
 }
 
-function renderWorkout(w, dayName) {
-  var lbl = document.getElementById('h-workout-lbl');
-  if (lbl) lbl.textContent = dayName ? 'Entreno — ' + dayName : 'Entreno de hoy';
+function renderWorkout(w) {
   document.getElementById('h-workout-title').textContent = (w.focus||'').toUpperCase();
   document.getElementById('h-workout-meta').textContent = (w.exercises?w.exercises.length:0) + ' ejercicios — ' + (w.duration||45) + ' min';
   document.getElementById('h-cta').style.display='block';
@@ -1433,9 +1398,7 @@ function renderWorkout(w, dayName) {
   }
 }
 
-function showRestDay(dayName) {
-  var lbl = document.getElementById('h-workout-lbl');
-  if (lbl) lbl.textContent = dayName ? 'Descanso — ' + dayName : 'Entreno de hoy';
+function showRestDay() {
   document.getElementById('h-workout-title').textContent = 'DIA DE DESCANSO';
   document.getElementById('h-workout-meta').textContent = 'Hoy toca recuperar. El descanso es parte del plan.';
   document.getElementById('h-exercises').innerHTML='';
@@ -1486,26 +1449,9 @@ window.saveWeight = function() {
   if (saved) {
     const profile = JSON.parse(saved);
     profile.weight = parseFloat(newWeight);
-    const h = parseFloat(profile.height) / 100;
-    const newBmi = h > 0 ? (profile.weight / (h * h)).toFixed(1) : null;
-    if (newBmi && profile.plan) {
-      profile.plan.bmi = newBmi;
-      const bmiN = parseFloat(newBmi);
-      profile.plan.bmiCategory = bmiN < 18.5 ? 'Bajo peso' : bmiN < 25 ? 'Peso normal' : bmiN < 30 ? 'Sobrepeso' : 'Obesidad';
-    }
     localStorage.setItem('rz_plan', JSON.stringify(profile));
     document.getElementById('pf-weight').textContent = newWeight + ' kg';
     document.getElementById('weight-edit-wrap').style.display = 'none';
-    if (newBmi && profile.plan) {
-      document.getElementById('pg-weight-val').textContent = newWeight + 'kg';
-      document.getElementById('pg-bmi-val').textContent = newBmi;
-      document.getElementById('pg-bmi-big').textContent = newBmi;
-      document.getElementById('pg-bmi-cat').textContent = profile.plan.bmiCategory;
-      document.getElementById('pf-bmi').textContent = newBmi + ' — ' + profile.plan.bmiCategory;
-      var bN = parseFloat(newBmi);
-      var bmiIdx = bN < 18.5 ? 0 : bN < 25 ? 1 : bN < 30 ? 2 : 3;
-      ['bmi-s1','bmi-s2','bmi-s3','bmi-s4'].forEach(function(id,idx){ document.getElementById(id).style.background = idx===bmiIdx ? '#fff' : '#333'; });
-    }
   }
 };
 window.startPro = function() {
@@ -1602,15 +1548,8 @@ window.generateMealPlan = async function() {
   FD.nutrGoals = [...document.querySelectorAll('#nutr-goal .chip.sel')].map(c=>c.textContent).join(', ') || 'General';
   
   go('p-meal-gen');
-  const mealSteps = ['mgs1','mgs2','mgs3','mgs4'];
-  mealSteps.forEach(function(id){ document.getElementById(id).classList.remove('done'); });
-  let mealStepIdx = 0;
-  const mealTicker = setInterval(function() {
-    if (mealStepIdx < mealSteps.length - 1) {
-      document.getElementById(mealSteps[mealStepIdx]).classList.add('done');
-      mealStepIdx++;
-    }
-  }, 1100);
+  const steps = ['mgs1','mgs2','mgs3','mgs4'];
+  for (let s of steps) { await delay(800); document.getElementById(s).classList.add('done'); }
 
   const saved = localStorage.getItem('rz_plan');
   const profile = saved ? JSON.parse(saved) : {};
@@ -1625,16 +1564,11 @@ Incluye 4-5 comidas. Adapta TODO a sus preferencias. No incluyas alimentos que n
     const res = await fetch('https://repzero-api.crue9445.workers.dev/', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt, max_tokens: 4000})
+      body:JSON.stringify({prompt})
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     const text = json.content[0].text;
-    const mealData = JSON.parse(text.replace(/```json[\s\S]*?```/g, function(m){ return m.slice(7,-3); }).replace(/```/g,'').trim());
-
-    clearInterval(mealTicker);
-    mealSteps.forEach(function(id){ document.getElementById(id).classList.add('done'); });
-    await delay(300);
+    const mealData = JSON.parse(text.replace(/```json|```/g,'').trim());
 
     // Save meal plan
     if (saved) {
@@ -1654,15 +1588,9 @@ Incluye 4-5 comidas. Adapta TODO a sus preferencias. No incluyas alimentos que n
     go('p-home');
 
   } catch(e) {
-    clearInterval(mealTicker);
-    console.error('Meal plan error:', e);
+    alert('Error: ' + e.message);
     go('p-home');
     showTab('nutricion');
-    var errDiv = document.createElement('div');
-    errDiv.style.cssText = 'background:#1a0000;border:1px solid #550000;border-radius:8px;padding:16px;margin-top:16px;text-align:center';
-    errDiv.innerHTML = '<div style="color:#ff5555;font-size:13px;margin-bottom:12px">No se pudo generar el plan de comidas.</div><button class="btn" onclick="window.regenerateMeals()" style="padding:14px">Intentar de nuevo</button>';
-    var freeEl = document.getElementById('n-free');
-    if (freeEl) freeEl.appendChild(errDiv);
   }
 };
 
@@ -1759,9 +1687,6 @@ window.logout = async function() {
   await SB.auth.signOut();
   localStorage.removeItem('rz_plan');
   localStorage.removeItem('rz_avatar');
-  localStorage.removeItem('rz_workouts');
-  localStorage.removeItem('rz_quote');
-  localStorage.removeItem('rz_pro');
   go('p-welcome');
 };
 window.goPro = function() {
@@ -1774,222 +1699,364 @@ window.resetPlan = function() {
   go('q1');
 };
 
-// ─── WORKOUT STATS ───
-function getWorkouts() {
-  try { return JSON.parse(localStorage.getItem('rz_workouts') || '[]'); } catch(e) { return []; }
-}
-function saveWorkout() {
-  var list = getWorkouts();
-  var ds = new Date().toDateString();
-  if (!list.includes(ds)) { list.push(ds); localStorage.setItem('rz_workouts', JSON.stringify(list)); }
-}
-function calcSessions() {
-  return getWorkouts().length;
-}
-function calcStreak() {
-  var list = getWorkouts();
-  if (!list.length) return 0;
-  var dates = list.map(function(s){ return new Date(s).toDateString(); });
-  var streak = 0;
-  var check = new Date();
-  while (true) {
-    if (dates.includes(check.toDateString())) {
-      streak++;
-      check.setDate(check.getDate() - 1);
-    } else break;
-  }
-  return streak;
-}
-function calcWeeklyCompletions(plan) {
-  var list = getWorkouts();
-  var now = new Date();
-  var startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0,0,0,0);
-  return list.filter(function(s){
-    var d = new Date(s);
-    return d >= startOfWeek;
-  }).length;
-}
-
-// ─── DAILY QUOTE ───
-async function getOrRefreshQuote(plan) {
-  var today = new Date().toDateString();
-  try {
-    var cached = JSON.parse(localStorage.getItem('rz_quote') || 'null');
-    if (cached && cached.date === today && cached.quote) return cached;
-  } catch(e) {}
-  try {
-    var res = await fetch('https://repzero-api.crue9445.workers.dev/', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:'Give a short motivational fitness quote in Spanish (under 20 words) and a practical gym tip in Spanish (under 30 words). Reply ONLY valid JSON: {"quote":"...","tip":"..."}', max_tokens:200})
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var json = await res.json();
-    var text = json.content[0].text;
-    var data = JSON.parse(text.replace(/```json[\s\S]*?```/g, function(m){ return m.slice(7,-3); }).replace(/```/g,'').trim());
-    var entry = {date: today, quote: data.quote || (plan && plan.quote) || '', tip: data.tip || (plan && plan.tip) || ''};
-    localStorage.setItem('rz_quote', JSON.stringify(entry));
-    return entry;
-  } catch(e) {
-    return {date: today, quote: (plan && plan.quote) || 'Empieza hoy. Sin excusas.', tip: (plan && plan.tip) || ''};
-  }
+// Fallback plan
+function fallbackPlan() {
+  return {
+    weekPlan:[
+      {day:"Lunes",type:"fuerza",focus:"Pecho y Triceps",duration:45,exercises:[
+        {name:"Press de banca",machine:"Maquina Smith",sets:3,reps:10,rest:60,howTo:"Tumba en el banco y empuja la barra hacia arriba de forma controlada.",tips:"Mantén la espalda apoyada en el banco."},
+        {name:"Aperturas con mancuernas",machine:"Banco plano",sets:3,reps:12,rest:60,howTo:"Con los brazos ligeramente flexionados, baja las mancuernas a los lados y sube.",tips:"Controla el movimiento en todo momento."},
+        {name:"Extensiones de triceps",machine:"Polea alta",sets:3,reps:15,rest:60,howTo:"Agarra la cuerda y empuja hacia abajo manteniendo los codos fijos.",tips:"No muevas los codos al empujar."}
+      ],cardio:{include:false}},
+      {day:"Miercoles",type:"fuerza",focus:"Espalda y Biceps",duration:45,exercises:[
+        {name:"Jalones al pecho",machine:"Polea alta",sets:3,reps:10,rest:60,howTo:"Agarra la barra y tira hacia el pecho manteniendo la espalda recta.",tips:"No te balancees al tirar."},
+        {name:"Remo con mancuerna",machine:"Banco inclinado",sets:3,reps:10,rest:60,howTo:"Apoya una rodilla en el banco y tira la mancuerna hacia la cadera.",tips:"Mantén la espalda paralela al suelo."},
+        {name:"Curl con mancuernas",machine:"Mancuernas",sets:3,reps:12,rest:60,howTo:"Sube las mancuernas girando la muneca hacia afuera al subir.",tips:"No balancees el cuerpo."}
+      ],cardio:{include:false}},
+      {day:"Viernes",type:"fuerza",focus:"Piernas y Hombros",duration:50,exercises:[
+        {name:"Sentadilla",machine:"Maquina Smith",sets:3,reps:10,rest:90,howTo:"Baja hasta que los muslos esten paralelos al suelo y vuelve arriba.",tips:"Mantén los talones en el suelo."},
+        {name:"Prensa de piernas",machine:"Prensa",sets:3,reps:12,rest:90,howTo:"Empuja la plataforma hasta casi extender las piernas sin bloquear las rodillas.",tips:"No bloquees las rodillas al extender."},
+        {name:"Press militar",machine:"Mancuernas",sets:3,reps:10,rest:60,howTo:"Empuja las mancuernas hacia arriba hasta casi extender los brazos.",tips:"Mantén el core activo."}
+      ],cardio:{include:false}}
+    ],
+    restDays:["Martes","Jueves","Sabado","Domingo"],
+    mealPlan:[
+      {meal:"Desayuno",time:"8:00",foods:["Avena 80g con leche","Platano","Cafe"],calories:420,protein:22,carbs:65,fat:7},
+      {meal:"Almuerzo",time:"13:00",foods:["Pechuga de pollo 200g","Arroz integral 100g","Ensalada verde"],calories:550,protein:48,carbs:52,fat:10},
+      {meal:"Merienda",time:"17:00",foods:["Yogur griego 200g","Fruta"],calories:230,protein:18,carbs:22,fat:5},
+      {meal:"Cena",time:"20:30",foods:["Salmon 180g","Brocoli al vapor","Patata cocida"],calories:480,protein:42,carbs:32,fat:14}
+    ],
+    dailyCalories:2200,dailyProtein:160,dailyCarbs:220,dailyFat:70,dailyWater:2.5,dailySteps:8000,
+    cardioWeekly:{type:"Cinta de correr",duration:20,frequency:"2 veces por semana",intensity:"Moderada — 65% frecuencia cardiaca maxima"},
+    quote:"No empieces el lunes. Empieza ahora.",
+    tip:"Descansa 60 segundos entre series. La calidad importa mas que el peso.",
+    weeklyGoal:"Completar los 3 dias de entreno sin faltar ninguno",
+    motivation:{title:"CONSTRUYE TU CUERPO",text:"Cada dia que entrenas eres mejor que ayer. La constancia es la clave del exito."},
+    bmi:"22.5",bmiCategory:"Peso normal"
+  };
 }
 
-// ─── WORKOUT MODE ───
-var wkExercises = [];
-var wkCurrentIdx = 0;
-var wkRestTimer = null;
-var wkCurrentWorkout = null;
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// ─── WORKOUT SYSTEM ───
+var currentWorkout = null;
+var currentExIdx = 0;
+var currentSetIdx = 0;
+var restTimer = null;
+var workoutStartTime = null;
 
 window.startWorkout = function() {
   var saved = localStorage.getItem('rz_plan');
   if (!saved) return;
   var profile = JSON.parse(saved);
   var plan = profile.plan;
-  var todayW = plan.weekPlan ? plan.weekPlan.find(function(w){ return w.day === todayName; }) : null;
-  if (!todayW || !todayW.exercises || !todayW.exercises.length) return;
-  wkCurrentWorkout = todayW;
-  wkExercises = todayW.exercises;
-  wkCurrentIdx = 0;
-  go('p-workout');
-  renderWkExercise();
-};
+  var todayName = DAYS[today.getDay()];
+  var workout = plan.weekPlan && plan.weekPlan.find(function(w){return w.day===todayName;});
+  if (!workout) return;
 
-window.exitWorkout = function() {
-  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
-  go('p-home');
-};
-
-function renderWkExercise() {
-  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
-  document.getElementById('wk-rest-timer').style.display = 'none';
-  var total = wkExercises.length;
-  var idx = wkCurrentIdx;
-  var ex = wkExercises[idx];
-  var pct = Math.round((idx / total) * 100);
-  document.getElementById('wk-prog-fill').style.width = pct + '%';
-  document.getElementById('wk-counter').textContent = (idx+1) + ' / ' + total;
-  document.getElementById('wk-ex-num').textContent = 'Ejercicio ' + (idx+1);
-  document.getElementById('wk-ex-name').textContent = (ex.name || '').toUpperCase();
-  document.getElementById('wk-ex-machine').textContent = ex.machine || '';
-  document.getElementById('wk-ex-how').textContent = ex.howTo || '';
-  var grid = document.getElementById('wk-sets-grid');
-  grid.innerHTML = '';
-  var sets = parseInt(ex.sets) || 3;
-  for (var s = 0; s < sets; s++) {
-    var btn = document.createElement('button');
-    btn.className = 'wk-set-btn';
-    btn.textContent = s + 1;
-    var sIdx = s;
-    var restSec = parseInt(ex.rest) || 60;
-    btn.onclick = (function(b, rs) {
-      return function() {
-        b.classList.toggle('done');
-        if (b.classList.contains('done')) startRestTimer(rs);
-      };
-    })(btn, restSec);
-    grid.appendChild(btn);
+  // Add cardio as exercise if applicable
+  var exercises = (workout.exercises||[]).slice();
+  if (workout.cardio && workout.cardio.include) {
+    exercises.push({
+      name: 'Cardio — ' + (workout.cardio.type||'Cinta'),
+      machine: workout.cardio.intensity || 'Moderada',
+      sets: 1,
+      reps: workout.cardio.duration || 20,
+      rest: 0,
+      howTo: 'Realiza ' + (workout.cardio.duration||20) + ' minutos de ' + (workout.cardio.type||'cardio') + ' a intensidad ' + (workout.cardio.intensity||'moderada') + '.',
+      tips: 'Mantén una respiracion constante y ritmo estable.',
+      isCardio: true
+    });
   }
-  document.getElementById('wk-sets-lbl').textContent = sets + ' series x ' + (ex.reps || 10) + ' reps — ' + (ex.rest || 60) + 's descanso';
-  var isLast = (idx === total - 1);
-  document.getElementById('wk-next-btn').textContent = isLast ? 'Completar entreno' : 'Siguiente ejercicio';
+
+  currentWorkout = { exercises: exercises, focus: workout.focus, duration: workout.duration };
+  currentExIdx = 0;
+  currentSetIdx = 0;
+  workoutStartTime = new Date();
+
+  document.getElementById('wm-title').textContent = (workout.focus||'ENTRENO').toUpperCase();
+  renderWorkoutExercise();
+  go('p-workout');
+};
+
+function renderWorkoutExercise() {
+  if (!currentWorkout) return;
+  var ex = currentWorkout.exercises[currentExIdx];
+  var total = currentWorkout.exercises.length;
+
+  document.getElementById('wm-ex-num').textContent = 'Ejercicio ' + (currentExIdx+1) + ' de ' + total;
+  document.getElementById('wm-ex-name').textContent = ex.name || '-';
+  document.getElementById('wm-ex-machine').textContent = ex.machine || '';
+  document.getElementById('wm-howto').textContent = ex.howTo || 'Realiza el ejercicio con buena forma.';
+
+  var tipsWrap = document.getElementById('wm-tips-wrap');
+  if (ex.tips) {
+    tipsWrap.style.display = 'block';
+    document.getElementById('wm-tips').textContent = ex.tips;
+  } else {
+    tipsWrap.style.display = 'none';
+  }
+
+  document.getElementById('wm-progress').textContent = (currentExIdx+1) + '/' + total;
+  document.getElementById('wm-sets-info').textContent = ex.isCardio
+    ? ex.reps + ' min'
+    : (ex.sets||3) + ' x ' + (ex.reps||10) + ' reps';
+
+  // Render sets
+  currentSetIdx = 0;
+  var setsList = document.getElementById('wm-sets-list');
+  setsList.innerHTML = '';
+  document.getElementById('wm-rest-wrap').style.display = 'none';
+
+  if (ex.isCardio) {
+    // Cardio — single timer button
+    var btn = document.createElement('button');
+    btn.style.cssText = 'width:100%;background:var(--dark);border:1.5px solid var(--line);border-radius:8px;padding:18px;color:var(--white);font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;text-align:left;display:flex;justify-content:space-between;align-items:center';
+    btn.innerHTML = '<span>Cardio</span><span style="color:var(--text)">Marcar como hecho</span>';
+    btn.onclick = function() {
+      btn.style.borderColor = '#fff';
+      btn.innerHTML = '<span>Cardio</span><span style="color:#fff">Completado</span>';
+      currentSetIdx = 1;
+      checkAllSetsDone();
+    };
+    setsList.appendChild(btn);
+  } else {
+    var sets = ex.sets || 3;
+    for (var s = 0; s < sets; s++) {
+      (function(setNum) {
+        var btn = document.createElement('button');
+        btn.id = 'set-btn-' + setNum;
+        btn.style.cssText = 'width:100%;background:var(--dark);border:1.5px solid var(--line);border-radius:8px;padding:18px;color:var(--white);font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;text-align:left;display:flex;justify-content:space-between;align-items:center';
+        btn.innerHTML = '<span>Serie ' + (setNum+1) + '</span><span style="color:var(--text)">' + (ex.reps||10) + ' reps</span>';
+        btn.onclick = function() {
+          if (setNum !== currentSetIdx) return;
+          btn.style.borderColor = '#fff';
+          btn.innerHTML = '<span>Serie ' + (setNum+1) + '</span><span style="color:#fff">Completada</span>';
+          currentSetIdx++;
+          // Start rest timer if not last set
+          var rest = ex.rest || 60;
+          if (currentSetIdx < sets && rest > 0) {
+            startRestTimer(rest);
+          } else {
+            checkAllSetsDone();
+          }
+        };
+        setsList.appendChild(btn);
+      })(s);
+    }
+  }
+
+  // Update next button
+  var nextBtn = document.getElementById('wm-next-btn');
+  var isLast = currentExIdx >= currentWorkout.exercises.length - 1;
+  nextBtn.textContent = isLast ? 'Finalizar entreno' : 'Siguiente ejercicio';
+  nextBtn.style.opacity = '0.4';
+  nextBtn.disabled = true;
+}
+
+function checkAllSetsDone() {
+  var ex = currentWorkout.exercises[currentExIdx];
+  var totalSets = ex.isCardio ? 1 : (ex.sets || 3);
+  if (currentSetIdx >= totalSets) {
+    var nextBtn = document.getElementById('wm-next-btn');
+    nextBtn.style.opacity = '1';
+    nextBtn.disabled = false;
+    document.getElementById('wm-rest-wrap').style.display = 'none';
+    clearInterval(restTimer);
+  }
 }
 
 function startRestTimer(seconds) {
-  if (wkRestTimer) clearInterval(wkRestTimer);
+  clearInterval(restTimer);
   var remaining = seconds;
-  var timerEl = document.getElementById('wk-rest-timer');
-  var valEl = document.getElementById('wk-rest-val');
-  timerEl.style.display = 'block';
-  valEl.textContent = remaining;
-  timerEl.onclick = function() {
-    clearInterval(wkRestTimer);
-    wkRestTimer = null;
-    timerEl.style.display = 'none';
-  };
-  wkRestTimer = setInterval(function() {
+  document.getElementById('wm-rest-wrap').style.display = 'block';
+  document.getElementById('wm-timer').textContent = remaining;
+  restTimer = setInterval(function() {
     remaining--;
-    valEl.textContent = remaining;
+    document.getElementById('wm-timer').textContent = remaining;
     if (remaining <= 0) {
-      clearInterval(wkRestTimer);
-      wkRestTimer = null;
-      timerEl.style.display = 'none';
+      clearInterval(restTimer);
+      document.getElementById('wm-rest-wrap').style.display = 'none';
+      checkAllSetsDone();
     }
   }, 1000);
 }
 
-window.wkNext = function() {
-  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
-  var total = wkExercises.length;
-  if (wkCurrentIdx >= total - 1) {
-    finishWorkout();
+window.skipRest = function() {
+  clearInterval(restTimer);
+  document.getElementById('wm-rest-wrap').style.display = 'none';
+  checkAllSetsDone();
+};
+
+window.nextExercise = function() {
+  clearInterval(restTimer);
+  var isLast = currentExIdx >= currentWorkout.exercises.length - 1;
+  if (isLast) {
+    completeWorkout();
   } else {
-    wkCurrentIdx++;
-    renderWkExercise();
+    currentExIdx++;
+    renderWorkoutExercise();
   }
 };
 
-window.wkSkip = function() {
-  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
-  var total = wkExercises.length;
-  if (wkCurrentIdx >= total - 1) {
-    finishWorkout();
-  } else {
-    wkCurrentIdx++;
-    renderWkExercise();
-  }
-};
-
-function finishWorkout() {
-  if (wkRestTimer) { clearInterval(wkRestTimer); wkRestTimer = null; }
-  saveWorkout();
+window.exitWorkout = function() {
+  clearInterval(restTimer);
   go('p-home');
-  showTab('progreso');
-  var sessions = calcSessions();
-  var streak = calcStreak();
-  var el = document.getElementById('pg-sessions');
-  if (el) el.textContent = sessions;
-  var el2 = document.getElementById('pg-streak');
-  if (el2) el2.textContent = streak;
+  showTab('home');
+};
+
+function completeWorkout() {
+  clearInterval(restTimer);
+
+  // Save workout
+  var today_str = new Date().toISOString().split('T')[0];
+  var workouts = JSON.parse(localStorage.getItem('rz_workouts') || '[]');
+  if (!workouts.includes(today_str)) {
+    workouts.push(today_str);
+    localStorage.setItem('rz_workouts', JSON.stringify(workouts));
+  }
+
+  // Calculate stats
+  var sessions = workouts.length;
+  var streak = calculateStreak(workouts);
+
+  document.getElementById('done-sessions').textContent = sessions;
+  document.getElementById('done-streak').textContent = streak;
+  document.getElementById('done-stats').textContent = 'Completado en ' + getElapsedTime() + '. Racha de ' + streak + ' dias.';
+
+  go('p-workout-done');
+}
+
+window.finishWorkout = function() {
+  go('p-home');
+  showTab('home');
+  // Refresh progreso stats
+  updateProgresoStats();
+};
+
+function calculateStreak(workouts) {
+  if (!workouts.length) return 0;
+  var sorted = workouts.slice().sort();
+  var streak = 1;
+  var today_str = new Date().toISOString().split('T')[0];
+  // Check if worked out today or yesterday
+  var last = sorted[sorted.length-1];
+  var dayDiff = Math.floor((new Date(today_str) - new Date(last)) / (1000*60*60*24));
+  if (dayDiff > 1) return 0;
+  for (var i = sorted.length-1; i > 0; i--) {
+    var diff = Math.floor((new Date(sorted[i]) - new Date(sorted[i-1])) / (1000*60*60*24));
+    if (diff === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function getElapsedTime() {
+  if (!workoutStartTime) return '-';
+  var mins = Math.floor((new Date() - workoutStartTime) / 60000);
+  return mins + ' min';
+}
+
+function updateProgresoStats() {
+  var workouts = JSON.parse(localStorage.getItem('rz_workouts') || '[]');
+  var sessions = workouts.length;
+  var streak = calculateStreak(workouts);
   var saved = localStorage.getItem('rz_plan');
+  var weeklyPlan = 3;
   if (saved) {
-    var profile = JSON.parse(saved);
-    var plan = profile.plan;
-    var totalDays = plan && plan.weekPlan ? plan.weekPlan.length : 3;
-    var completed = calcWeeklyCompletions(plan);
-    var el3 = document.getElementById('pg-completed');
-    if (el3) el3.textContent = completed;
-    var el4 = document.getElementById('pg-total');
-    if (el4) el4.textContent = totalDays;
-    var pct = totalDays > 0 ? Math.round((completed / totalDays) * 100) : 0;
-    var barEl = document.getElementById('pg-bar');
-    if (barEl) barEl.style.width = Math.min(pct, 100) + '%';
+    var p = JSON.parse(saved);
+    if (p.plan && p.plan.weekPlan) weeklyPlan = p.plan.weekPlan.length;
+  }
+  // This week's workouts
+  var weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  var weekStart_str = weekStart.toISOString().split('T')[0];
+  var thisWeek = workouts.filter(function(d){return d >= weekStart_str;}).length;
+
+  var els = {
+    'pg-sessions': sessions,
+    'pg-streak': streak,
+    'pg-this-week': thisWeek,
+    'pg-total-planned': weeklyPlan
+  };
+  Object.keys(els).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = els[id];
+  });
+  var bar = document.getElementById('pg-bar');
+  if (bar) bar.style.width = Math.min(100, Math.round((thisWeek/weeklyPlan)*100)) + '%';
+  var total = document.getElementById('pg-total');
+  if (total) total.textContent = weeklyPlan;
+
+  // Update home header streak
+  var homeStreak = document.getElementById('h-streak');
+  if (homeStreak) homeStreak.textContent = streak;
+}
+
+// ─── DAILY QUOTE REFRESH ───
+async function refreshDailyQuote() {
+  var saved = localStorage.getItem('rz_plan');
+  if (!saved) return;
+  var profile = JSON.parse(saved);
+  var today_str = new Date().toISOString().split('T')[0];
+  var lastQuoteDate = localStorage.getItem('rz_quote_date');
+  if (lastQuoteDate === today_str) return; // Already fresh today
+
+  try {
+    var goal = (profile.goal || 'ganar musculo').toLowerCase();
+    var prompt = 'Dame UNA frase motivacional corta y potente en espanol para alguien cuyo objetivo es ' + goal + '. Solo la frase, sin comillas ni explicacion. Maximo 15 palabras.';
+    var res = await fetch('https://repzero-api.crue9445.workers.dev/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({prompt: prompt})
+    });
+    var json = await res.json();
+    if (json.content && json.content[0]) {
+      var newQuote = json.content[0].text.trim().replace(/^["']|["']$/g,'');
+      localStorage.setItem('rz_quote_date', today_str);
+      localStorage.setItem('rz_daily_quote', newQuote);
+      var el = document.getElementById('h-quote');
+      if (el) el.textContent = newQuote;
+    }
+  } catch(e) {
+    // Keep existing quote if fetch fails
   }
 }
 
-function delay(ms){return new Promise(r=>setTimeout(r,ms));}
-
 // ─── INIT ───
-const saved = localStorage.getItem('rz_plan');
+var saved = localStorage.getItem('rz_plan');
 if (saved) {
   try {
-    const profile = JSON.parse(saved);
+    var profile = JSON.parse(saved);
     if (profile && profile.plan) {
       loadHome(profile);
       go('p-home');
-      // Check if pro and has meal plan
-      if (localStorage.getItem('rz_pro') === 'true' && profile.plan.mealPlan) {
+      updateProgresoStats();
+      refreshDailyQuote();
+      // Restore daily quote if cached
+      var cachedQuote = localStorage.getItem('rz_daily_quote');
+      if (cachedQuote) {
+        var qel = document.getElementById('h-quote');
+        if (qel) qel.textContent = cachedQuote;
+      }
+      if (localStorage.getItem('rz_pro') === 'true' && profile.plan && profile.plan.mealPlan) {
         showProNutricion();
       }
     } else go('p-welcome');
   } catch(e) { go('p-welcome'); }
 } else {
-  SB.auth.getSession().then(async ({data:{session}}) => {
+  SB.auth.getSession().then(async function(result) {
+    var session = result.data && result.data.session;
     if (session) {
-      const {data:prof} = await SB.from('repzero_profiles').select('*').eq('user_id',session.user.id).single();
-      if (prof && prof.plan) { localStorage.setItem('rz_plan',JSON.stringify(prof)); loadHome(prof); go('p-home'); }
+      var profResult = await SB.from('repzero_profiles').select('*').eq('user_id',session.user.id).single();
+      var prof = profResult.data;
+      if (prof && prof.plan) {
+        localStorage.setItem('rz_plan', JSON.stringify(prof));
+        loadHome(prof);
+        go('p-home');
+        updateProgresoStats();
+        refreshDailyQuote();
+      }
     }
   });
 }
