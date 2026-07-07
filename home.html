@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RepZero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#000; --surface:#0c0c0c; --border:#2a2a2a;
+    --text:#fff; --text-dim:#6e6e6e; --text-dim-2:#3d3d3d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter', sans-serif; min-height:100vh; padding-bottom:110px; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  header{ padding:22px 22px 0; display:flex; justify-content:space-between; align-items:center; }
+  .logo{ font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; }
+  .signout{ background:none; border:1px solid var(--border); color:var(--text-dim); font-family:'JetBrains Mono'; font-size:11px; letter-spacing:.5px; padding:8px 13px; text-transform:uppercase; cursor:pointer; }
+
+  .hero{ padding:26px 22px 20px; border-bottom:1px solid var(--border); }
+  .hero-label{ font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:8px; }
+  .hero-day{ font-family:'Bebas Neue'; font-size:72px; line-height:.9; letter-spacing:1px; text-transform:uppercase; }
+  .hero-date{ font-family:'JetBrains Mono'; color:var(--text-dim); font-size:13px; margin-top:8px; text-transform:uppercase; letter-spacing:.5px; }
+
+  .stats-row{ display:flex; border-bottom:1px solid var(--border); }
+  .stat-pill{ flex:1; padding:20px 22px; }
+  .stat-pill:first-child{ border-right:1px solid var(--border); }
+  .stat-num{ font-family:'JetBrains Mono'; font-weight:700; font-size:32px; line-height:1; }
+  .stat-label{ font-family:'JetBrains Mono'; font-size:10px; color:var(--text-dim); margin-top:6px; text-transform:uppercase; letter-spacing:1.5px; }
+
+  .section{ padding:0 22px; margin-top:32px; }
+  .section-head{ display:flex; align-items:center; gap:14px; margin-bottom:2px; }
+  .section-title{ font-family:'Bebas Neue'; font-size:26px; letter-spacing:1px; text-transform:uppercase; white-space:nowrap; }
+  .rule{ flex:1; height:1px; background:var(--border); }
+  .chat-link{ font-family:'JetBrains Mono'; font-size:10px; letter-spacing:1px; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:8px 12px; text-transform:uppercase; }
+  .chat-link:active{ background:var(--surface); }
+  .section-head-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+
+  .focus-tag{ font-family:'JetBrains Mono'; font-size:11px; letter-spacing:1px; color:var(--text-dim); text-transform:uppercase; margin-bottom:16px; }
+
+  .progress-track{ height:2px; background:var(--text-dim-2); margin-bottom:20px; }
+  .progress-fill{ height:100%; background:#fff; transition:width .3s ease; }
+
+  .item{ display:flex; align-items:center; gap:14px; padding:16px 0; border-bottom:1px solid var(--border); }
+  .item:last-child{ border-bottom:none; }
+  .check{ width:22px; height:22px; border:1.5px solid var(--text-dim); flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.12s; }
+  .check.done{ background:#fff; border-color:#fff; }
+  .check svg{ width:12px; height:12px; opacity:0; transition:.12s; }
+  .check.done svg{ opacity:1; }
+  .item-text{ flex:1; }
+  .item-name{ font-size:15px; font-weight:500; }
+  .item-name.done{ color:var(--text-dim); text-decoration:line-through; }
+  .item-detail{ font-size:13px; color:var(--text-dim); margin-top:2px; }
+  .item-detail-side{ font-family:'JetBrains Mono'; font-size:13px; color:var(--text-dim); font-weight:600; flex-shrink:0; }
+
+  .empty{ color:var(--text-dim); font-size:14px; padding:30px 0; font-family:'JetBrains Mono'; text-transform:uppercase; letter-spacing:.5px; }
+  .rest{ padding:34px 0; }
+  .rest-text{ font-family:'Bebas Neue'; font-size:28px; letter-spacing:1px; }
+  .rest-sub{ font-family:'JetBrains Mono'; color:var(--text-dim); font-size:11px; margin-top:6px; text-transform:uppercase; letter-spacing:1px; }
+
+  nav{ position:fixed; bottom:0; left:0; right:0; background:#000; border-top:1px solid var(--border); display:flex; padding:14px 0 calc(14px + env(safe-area-inset-bottom)); }
+  nav a{ flex:1; text-align:center; text-decoration:none; color:var(--text-dim); font-family:'JetBrains Mono'; font-size:11px; text-transform:uppercase; letter-spacing:1px; }
+  nav a.active{ color:#fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">REPZERO</div>
+  <button class="signout" id="signoutBtn">Salir</button>
+</header>
+
+<div class="hero">
+  <div class="hero-label">Hoy</div>
+  <div class="hero-day" id="heroDay">—</div>
+  <div class="hero-date" id="heroDate"></div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-pill">
+    <div class="stat-num mono" id="gymStat">0/0</div>
+    <div class="stat-label">Ejercicios</div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-num mono" id="foodStat">0/0</div>
+    <div class="stat-label">Comidas</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head-row">
+    <div class="section-head">
+      <div class="section-title">Gym</div>
+      <div class="rule"></div>
+    </div>
+    <a class="chat-link" href="gym-ai.html">Gym AI</a>
+  </div>
+  <div id="gymCard">
+    <div class="empty">Cargando</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head-row">
+    <div class="section-head">
+      <div class="section-title">Comida</div>
+      <div class="rule"></div>
+    </div>
+    <a class="chat-link" href="food-ai.html">Food AI</a>
+  </div>
+  <div id="foodCard">
+    <div class="empty">Cargando</div>
+  </div>
+</div>
+
+<nav>
+  <a href="home.html" class="active">Hoy</a>
+  <a href="gym-ai.html">Gym AI</a>
+  <a href="food-ai.html">Food AI</a>
+</nav>
+
+<script>
+  const SUPABASE_URL = "https://sdixtismheecuqjxctyr.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkaXh0aXNtaGVlY3VxanhjdHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzg1NTgsImV4cCI6MjA5ODkxNDU1OH0.tY8y3pawVJr358U7hmTX1bSjIkt6TwBapm2WK1JcTds";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const dayNames = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const todayKey = new Date().toISOString().slice(0,10);
+
+  function todayName(){ return dayNames[new Date().getDay()]; }
+
+  function loadDone(type){
+    try { return JSON.parse(localStorage.getItem(`repzero_done_${type}_${todayKey}`) || '{}'); }
+    catch { return {}; }
+  }
+  function saveDone(type, doneMap){
+    localStorage.setItem(`repzero_done_${type}_${todayKey}`, JSON.stringify(doneMap));
+  }
+
+  const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+  function updateStat(elId, done, total){
+    document.getElementById(elId).textContent = `${done}/${total}`;
+  }
+
+  function renderGym(plan){
+    const card = document.getElementById('gymCard');
+    if (!plan) { card.innerHTML = '<div class="empty">Sin plan de gym</div>'; updateStat('gymStat', 0, 0); return; }
+    const today = todayName();
+    const dayPlan = (plan.days || []).find(d => d.day === today);
+    if (!dayPlan) {
+      card.innerHTML = '<div class="rest"><div class="rest-text">Descanso</div><div class="rest-sub">No hay entreno hoy</div></div>';
+      updateStat('gymStat', 0, 0);
+      return;
+    }
+    const exercises = dayPlan.exercises || [];
+    let done = loadDone('gym');
+
+    function refresh(){
+      const doneCount = exercises.filter((_, i) => done[i]).length;
+      updateStat('gymStat', doneCount, exercises.length);
+      card.querySelector('.progress-fill').style.width = exercises.length ? (doneCount/exercises.length*100)+'%' : '0%';
+    }
+
+    let html = `<div class="focus-tag">${dayPlan.focus || today}</div><div class="progress-track"><div class="progress-fill"></div></div>`;
+    exercises.forEach((ex, i) => {
+      html += `<div class="item">
+        <div class="check" data-i="${i}">${checkSvg}</div>
+        <div class="item-text"><div class="item-name">${ex.name}</div></div>
+        <div class="item-detail-side">${ex.sets}×${ex.reps}</div>
+      </div>`;
+    });
+    card.innerHTML = html;
+    refresh();
+
+    card.querySelectorAll('.check').forEach(el => {
+      const i = el.dataset.i;
+      if (done[i]) { el.classList.add('done'); el.nextElementSibling.querySelector('.item-name').classList.add('done'); }
+      el.addEventListener('click', () => {
+        done[i] = !done[i];
+        saveDone('gym', done);
+        el.classList.toggle('done');
+        el.nextElementSibling.querySelector('.item-name').classList.toggle('done');
+        refresh();
+      });
+    });
+  }
+
+  function renderFood(plan){
+    const card = document.getElementById('foodCard');
+    if (!plan) { card.innerHTML = '<div class="empty">Sin plan de comidas</div>'; updateStat('foodStat', 0, 0); return; }
+    const today = todayName();
+    const dayPlan = (plan.days || []).find(d => d.day === today);
+    if (!dayPlan) { card.innerHTML = '<div class="empty">Sin plan para hoy</div>'; updateStat('foodStat', 0, 0); return; }
+    const meals = dayPlan.meals || [];
+    let done = loadDone('food');
+
+    function refresh(){
+      const doneCount = meals.filter((_, i) => done[i]).length;
+      updateStat('foodStat', doneCount, meals.length);
+      card.querySelector('.progress-fill').style.width = meals.length ? (doneCount/meals.length*100)+'%' : '0%';
+    }
+
+    let html = `<div class="focus-tag">${meals.length} comidas</div><div class="progress-track"><div class="progress-fill"></div></div>`;
+    meals.forEach((m, i) => {
+      html += `<div class="item">
+        <div class="check" data-i="${i}">${checkSvg}</div>
+        <div class="item-text">
+          <div class="item-name">${m.name}</div>
+          <div class="item-detail">${m.items}</div>
+        </div>
+      </div>`;
+    });
+    card.innerHTML = html;
+    refresh();
+
+    card.querySelectorAll('.check').forEach(el => {
+      const i = el.dataset.i;
+      if (done[i]) { el.classList.add('done'); el.nextElementSibling.querySelector('.item-name').classList.add('done'); }
+      el.addEventListener('click', () => {
+        done[i] = !done[i];
+        saveDone('food', done);
+        el.classList.toggle('done');
+        el.nextElementSibling.querySelector('.item-name').classList.toggle('done');
+        refresh();
+      });
+    });
+  }
+
+  (async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+    const userId = session.user.id;
+
+    document.getElementById('heroDay').textContent = todayName();
+    document.getElementById('heroDate').textContent = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+
+    const { data: gymPlans } = await supabase.from('daily_plans')
+      .select('content').eq('user_id', userId).eq('type', 'gym')
+      .order('created_at', { ascending: false }).limit(1);
+    renderGym(gymPlans && gymPlans[0] ? gymPlans[0].content : null);
+
+    const { data: foodPlans } = await supabase.from('daily_plans')
+      .select('content').eq('user_id', userId).eq('type', 'food')
+      .order('created_at', { ascending: false }).limit(1);
+    renderFood(foodPlans && foodPlans[0] ? foodPlans[0].content : null);
+
+    document.getElementById('signoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
+    });
+  })();
+</script>
+
+</body>
+</html>
