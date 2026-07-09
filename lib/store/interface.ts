@@ -5,6 +5,7 @@ import type {
   ScheduleSlot,
   Habit,
   HabitLog,
+  WaterLog,
   ChatMessage,
   NutritionPlan,
   AppData,
@@ -33,6 +34,9 @@ export interface DataStore {
 
   listHabitLogs(): Promise<HabitLog[]>;
   setHabitLog(log: HabitLog): Promise<void>;
+
+  listWaterLogs(): Promise<WaterLog[]>;
+  setWaterLog(log: WaterLog): Promise<void>;
 
   getCoachThread(): Promise<ChatMessage[]>;
   saveCoachThread(messages: ChatMessage[]): Promise<void>;

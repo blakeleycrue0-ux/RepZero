@@ -55,7 +55,7 @@ export default function SettingsPage() {
 
   async function handleDelete() {
     const confirmed = window.confirm(
-      "Delete all your Repsette data from this device? This can't be undone."
+      `Delete all your ${brand.name} data from this device? This can't be undone.`
     );
     if (!confirmed) return;
     setDeleting(true);

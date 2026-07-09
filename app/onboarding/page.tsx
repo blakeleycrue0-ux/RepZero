@@ -8,6 +8,7 @@ import type { DietPattern, Equipment, Experience, Goal, Profile } from "@/lib/st
 import { PrimaryButton, SecondaryButton, ChoiceCard } from "@/components/ui";
 import { IconArrowLeft } from "@/components/icons";
 import { brand } from "@/lib/brand";
+import Logo from "@/components/Logo";
 
 const GOALS: { value: Goal; title: string; description: string }[] = [
   { value: "build_muscle", title: "Build muscle", description: "Add size and strength across the board." },
@@ -125,8 +126,8 @@ export default function OnboardingPage() {
             <IconArrowLeft width={16} height={16} />
           </button>
         ) : (
-          <Link href="/" className="font-display text-base tracking-tight">
-            {brand.name}
+          <Link href="/">
+            <Logo size={19} />
           </Link>
         )}
         <span className="text-[12px] tabular-nums text-text-tertiary">

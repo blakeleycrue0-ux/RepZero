@@ -6,9 +6,15 @@ Choices made where the build brief left something open, and why.
 
 The repo previously held a static-HTML prototype called "RepZero" (`index.html`, `home.html`,
 etc.). That prototype doesn't match the brief (no Next.js, no server-side AI proxy, no design
-system) and the brief calls for a from-scratch, website-first rebuild under the working title
-"Repsette." Rather than delete the old prototype outright, it's preserved under
+system) and the brief calls for a from-scratch, website-first rebuild, initially under the
+working title "Repsette." Rather than delete the old prototype outright, it's preserved under
 `legacy-static/` for reference; the live app is the new Next.js codebase at the repo root.
+
+Once the real product name and logo were provided, the app was rebranded to **RepZero** (its
+original name) via `lib/brand.ts` and the provided logo mark (`public/logo-mark.png`, plus
+generated app icons). IndexedDB database names also moved from `repsette-*` to `repzero-*`,
+which resets local data for anyone who used the app during the brief Repsette-named window —
+an acceptable one-time cost this early, with no migration path built for it.
 
 ## Fonts
 

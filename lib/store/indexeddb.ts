@@ -7,6 +7,7 @@ import type {
   ScheduleSlot,
   Habit,
   HabitLog,
+  WaterLog,
   ChatMessage,
   NutritionPlan,
   AppData,
@@ -16,7 +17,7 @@ import type {
 // only creates an object store during that database's initial upgrade, so
 // reusing one DB name across multiple createStore() calls silently drops
 // every store after the first — separate DB names sidestep that entirely.
-const DB_PREFIX = "repsette";
+const DB_PREFIX = "repzero";
 
 const profileStore = createStore(`${DB_PREFIX}-profile`, "profile");
 const scanStore = createStore(`${DB_PREFIX}-scans`, "scans");
@@ -24,6 +25,7 @@ const planStore = createStore(`${DB_PREFIX}-plans`, "plans");
 const scheduleStore = createStore(`${DB_PREFIX}-schedule`, "schedule");
 const habitStore = createStore(`${DB_PREFIX}-habits`, "habits");
 const habitLogStore = createStore(`${DB_PREFIX}-habitLogs`, "habitLogs");
+const waterLogStore = createStore(`${DB_PREFIX}-waterLogs`, "waterLogs");
 const threadStore = createStore(`${DB_PREFIX}-threads`, "threads");
 const nutritionPlanStore = createStore(`${DB_PREFIX}-nutritionPlans`, "nutritionPlans");
 
@@ -92,6 +94,13 @@ export class IndexedDbStore implements DataStore {
     await set(`${log.date}:${log.habitId}`, log, habitLogStore);
   }
 
+  async listWaterLogs() {
+    return listAll<WaterLog>(waterLogStore);
+  }
+  async setWaterLog(log: WaterLog) {
+    await set(log.date, log, waterLogStore);
+  }
+
   async getCoachThread() {
     return (await get<ChatMessage[]>(COACH_THREAD_KEY, threadStore)) ?? [];
   }
@@ -122,6 +131,7 @@ export class IndexedDbStore implements DataStore {
       schedule,
       habits,
       habitLogs,
+      waterLogs,
       coachThread,
       nutritionThread,
       nutritionPlans,
@@ -132,6 +142,7 @@ export class IndexedDbStore implements DataStore {
       this.getSchedule(),
       this.listHabits(),
       this.listHabitLogs(),
+      this.listWaterLogs(),
       this.getCoachThread(),
       this.getNutritionThread(),
       this.listNutritionPlans(),
@@ -143,6 +154,7 @@ export class IndexedDbStore implements DataStore {
       schedule,
       habits,
       habitLogs,
+      waterLogs,
       coachThread,
       nutritionThread,
       nutritionPlans,
@@ -157,6 +169,7 @@ export class IndexedDbStore implements DataStore {
       clear(scheduleStore),
       clear(habitStore),
       clear(habitLogStore),
+      clear(waterLogStore),
       clear(threadStore),
       clear(nutritionPlanStore),
     ]);

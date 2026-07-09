@@ -101,6 +101,11 @@ export interface HabitLog {
   done: boolean;
 }
 
+export interface WaterLog {
+  date: string; // YYYY-MM-DD
+  ml: number;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -112,8 +117,10 @@ export interface NutritionPlan {
   id: string;
   createdAt: string;
   targetCalories: number;
+  maintenanceCalories: number;
+  calorieStrategy: "deficit" | "surplus" | "maintenance";
   macros: { protein: number; carbs: number; fat: number };
-  meals: { name: string; description: string; items: string[] }[];
+  meals: { name: string; description: string; calories: number; items: string[] }[];
   notes: string;
 }
 
@@ -124,6 +131,7 @@ export interface AppData {
   schedule: ScheduleSlot[];
   habits: Habit[];
   habitLogs: HabitLog[];
+  waterLogs: WaterLog[];
   coachThread: ChatMessage[];
   nutritionThread: ChatMessage[];
   nutritionPlans: NutritionPlan[];

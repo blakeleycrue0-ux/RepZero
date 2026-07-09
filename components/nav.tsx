@@ -14,8 +14,8 @@ import {
   IconMore,
   IconSettings,
 } from "@/components/icons";
-import { brand } from "@/lib/brand";
 import ThemeToggle from "@/components/ThemeToggle";
+import Logo from "@/components/Logo";
 
 type NavItem = {
   href: string;
@@ -63,8 +63,8 @@ function TopNav({ pathname }: { pathname: string }) {
   return (
     <header className="sticky top-0 z-40 hidden border-b border-border-subtle bg-surface-0/90 backdrop-blur md:block">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8">
-        <Link href="/home" className="font-display text-lg tracking-tight">
-          {brand.name}
+        <Link href="/home">
+          <Logo />
         </Link>
         <nav className="flex items-center gap-1" aria-label="Primary">
           {[...PRIMARY, ...SECONDARY].map((item) => (

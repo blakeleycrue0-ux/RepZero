@@ -1,4 +1,4 @@
-const CACHE = "repsette-shell-v1";
+const CACHE = "repzero-shell-v1";
 const OFFLINE_URL = "/offline";
 const PRECACHE = [OFFLINE_URL, "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
