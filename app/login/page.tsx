@@ -3,17 +3,23 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase, supabaseEnabled, sendMagicLink } from "@/lib/supabase/client";
+import { supabase, supabaseEnabled, signUpWithPassword, signInWithPassword } from "@/lib/supabase/client";
 import { PrimaryButton } from "@/components/ui";
 import Logo from "@/components/Logo";
 import { brand } from "@/lib/brand";
 
+type Mode = "login" | "signup";
+
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("signup");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -22,20 +28,60 @@ export default function LoginPage() {
     });
   }, [router]);
 
-  async function handleSend(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
-    setSending(true);
     setError(null);
-    const { error } = await sendMagicLink(email.trim());
-    setSending(false);
-    if (error) setError(error);
-    else setSent(true);
+
+    if (mode === "signup") {
+      if (!name.trim()) return setError("Enter your name.");
+      if (password.length < 6) return setError("Password must be at least 6 characters.");
+      if (password !== confirmPassword) return setError("Passwords don't match.");
+    }
+
+    setSubmitting(true);
+    if (mode === "signup") {
+      const { error, needsConfirmation } = await signUpWithPassword(email.trim(), password, name.trim());
+      setSubmitting(false);
+      if (error) return setError(error);
+      if (needsConfirmation) {
+        setNeedsConfirmation(true);
+      } else {
+        router.replace("/onboarding");
+      }
+    } else {
+      const { error } = await signInWithPassword(email.trim(), password);
+      setSubmitting(false);
+      if (error) return setError(error);
+      router.replace("/home");
+    }
+  }
+
+  if (needsConfirmation) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center px-6 text-center">
+        <Logo size={30} />
+        <h1 className="mt-8 font-display text-2xl">Confirm your email</h1>
+        <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
+          We sent a confirmation link to <span className="font-medium text-text-primary">{email}</span>.
+          Click it, then come back and log in.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setNeedsConfirmation(false);
+            setMode("login");
+          }}
+          className="mt-6 text-[13px] font-medium text-navy-hi underline underline-offset-4"
+        >
+          Back to log in
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6 py-12">
-      <div className="mb-10 flex justify-center">
+      <div className="mb-8 flex justify-center">
         <Logo size={30} />
       </div>
 
@@ -43,40 +89,70 @@ export default function LoginPage() {
         <p className="text-center text-[14px] text-danger">
           Accounts aren&rsquo;t configured for this deployment yet.
         </p>
-      ) : sent ? (
-        <div className="text-center">
-          <h1 className="font-display text-2xl">Check your email</h1>
-          <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
-            We sent a sign-in link to <span className="font-medium text-text-primary">{email}</span>.
-            Open it on this device to continue.
-          </p>
-          <button
-            type="button"
-            onClick={() => setSent(false)}
-            className="mt-6 text-[13px] font-medium text-navy-hi underline underline-offset-4"
-          >
-            Use a different email
-          </button>
-        </div>
       ) : (
         <>
-          <h1 className="text-center font-display text-2xl">Sign in to {brand.name}</h1>
-          <p className="mt-2 text-center text-[14px] leading-relaxed text-text-secondary">
-            No password — we&rsquo;ll email you a link. Your data stays tied to this account across
-            every device.
-          </p>
-          <form onSubmit={handleSend} className="mt-6 flex flex-col gap-3">
+          <div className="mb-6 flex justify-center gap-1">
+            {(["signup", "login"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setMode(m);
+                  setError(null);
+                }}
+                className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors ${
+                  mode === m ? "bg-surface-inverse text-text-inverse" : "text-text-secondary"
+                }`}
+              >
+                {m === "signup" ? "Create account" : "Log in"}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            {mode === "signup" && (
+              <input
+                type="text"
+                required
+                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+                className="rounded-xl border border-border-subtle bg-surface-0 px-4 py-3 text-[14px] outline-none focus:border-navy-hi"
+              />
+            )}
             <input
               type="email"
               required
-              autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="Email"
               className="rounded-xl border border-border-subtle bg-surface-0 px-4 py-3 text-[14px] outline-none focus:border-navy-hi"
             />
-            <PrimaryButton type="submit" disabled={sending} className="w-full">
-              {sending ? "Sending…" : "Send sign-in link"}
+            <input
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              className="rounded-xl border border-border-subtle bg-surface-0 px-4 py-3 text-[14px] outline-none focus:border-navy-hi"
+            />
+            {mode === "signup" && (
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                autoComplete="new-password"
+                className="rounded-xl border border-border-subtle bg-surface-0 px-4 py-3 text-[14px] outline-none focus:border-navy-hi"
+              />
+            )}
+            <PrimaryButton type="submit" disabled={submitting} className="mt-1 w-full">
+              {submitting ? "…" : mode === "signup" ? "Create account" : "Log in"}
             </PrimaryButton>
           </form>
           {error && (

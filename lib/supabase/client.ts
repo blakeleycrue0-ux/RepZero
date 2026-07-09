@@ -13,14 +13,29 @@ export { supabaseEnabled };
 // handling needed since every page is client-rendered.
 export const supabase = supabaseEnabled ? createClient(url as string, anonKey as string) : null;
 
-export async function sendMagicLink(email: string): Promise<{ error: string | null }> {
-  if (!supabase) return { error: "Accounts aren't configured for this deployment." };
-  const { error } = await supabase.auth.signInWithOtp({
+export async function signUpWithPassword(
+  email: string,
+  password: string,
+  name: string
+): Promise<{ error: string | null; needsConfirmation: boolean }> {
+  if (!supabase) return { error: "Accounts aren't configured for this deployment.", needsConfirmation: false };
+  const { data, error } = await supabase.auth.signUp({
     email,
+    password,
     options: {
+      data: { full_name: name },
       emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
     },
   });
+  if (error) return { error: error.message, needsConfirmation: false };
+  // If the Supabase project has "Confirm email" on, signUp succeeds but
+  // returns no session until the user clicks the confirmation email.
+  return { error: null, needsConfirmation: !data.session };
+}
+
+export async function signInWithPassword(email: string, password: string): Promise<{ error: string | null }> {
+  if (!supabase) return { error: "Accounts aren't configured for this deployment." };
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
   return { error: error?.message ?? null };
 }
 
