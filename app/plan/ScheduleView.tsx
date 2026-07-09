@@ -1,10 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ScheduleSlot, WorkoutPlan } from "@/lib/store/types";
 import { WEEKDAY_NAMES } from "@/lib/schedule";
-import { Card } from "@/components/ui";
-import { IconBell } from "@/components/icons";
+import { Card, SecondaryButton } from "@/components/ui";
+import { IconBell, IconCheck } from "@/components/icons";
+import { generateSchedureIcs, downloadIcs } from "@/lib/ics";
+import {
+  notificationsSupported,
+  requestNotificationPermission,
+  scheduleUpcomingReminders,
+} from "@/lib/notifications";
+import { brand } from "@/lib/brand";
 
 export default function ScheduleView({
   plan,
@@ -17,6 +24,22 @@ export default function ScheduleView({
 }) {
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const dragging = useRef<number | null>(null);
+  const [remindersOn, setRemindersOn] = useState(false);
+
+  useEffect(() => {
+    if (notificationsSupported() && Notification.permission === "granted") {
+      setRemindersOn(true);
+      scheduleUpcomingReminders(schedule, plan);
+    }
+  }, [schedule, plan]);
+
+  async function enableReminders() {
+    const permission = await requestNotificationPermission();
+    if (permission === "granted") {
+      setRemindersOn(true);
+      scheduleUpcomingReminders(schedule, plan);
+    }
+  }
 
   function swap(a: number, b: number) {
     if (a === b) return;
@@ -39,6 +62,35 @@ export default function ScheduleView({
 
   return (
     <div>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {notificationsSupported() && (
+          <SecondaryButton
+            onClick={enableReminders}
+            disabled={remindersOn}
+            className="!px-3.5 !py-1.5 text-[12px]"
+          >
+            {remindersOn ? (
+              <>
+                <IconCheck width={13} height={13} /> Reminders on
+              </>
+            ) : (
+              <>
+                <IconBell width={13} height={13} /> Enable reminders
+              </>
+            )}
+          </SecondaryButton>
+        )}
+        <SecondaryButton
+          onClick={() => downloadIcs(generateSchedureIcs(schedule, plan), `${brand.short.toLowerCase()}-schedule.ics`)}
+          className="!px-3.5 !py-1.5 text-[12px]"
+        >
+          Add to calendar
+        </SecondaryButton>
+      </div>
+      <p className="mb-4 text-[12px] text-text-tertiary">
+        Reminders fire while {brand.name} is open in a tab or installed. For a guaranteed alert
+        regardless, add sessions to your calendar.
+      </p>
       <p className="mb-4 text-[13px] text-text-secondary">
         Drag a session onto another day to move it — the time and reminder move with it.
       </p>
