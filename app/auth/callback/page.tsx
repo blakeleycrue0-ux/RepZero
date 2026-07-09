@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { getStore } from "@/lib/store";
 import { Spinner } from "@/components/ui";
 
 export default function AuthCallbackPage() {
@@ -23,7 +24,18 @@ export default function AuthCallbackPage() {
       const { data } = await client.auth.getSession();
       if (cancelled) return;
       if (data.session) {
-        router.replace("/home");
+        // Give the background pull-on-login (lib/supabase/sync.ts) a moment
+        // to land before deciding onboarding vs. home, so a returning user
+        // on a fresh browser doesn't get bounced into onboarding.
+        for (let i = 0; i < 10; i++) {
+          const profile = await getStore().getProfile();
+          if (profile) {
+            router.replace("/home");
+            return;
+          }
+          await new Promise((r) => setTimeout(r, 300));
+        }
+        router.replace("/onboarding");
       } else {
         setTimeout(check, 300);
       }

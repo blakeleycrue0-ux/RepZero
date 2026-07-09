@@ -6,6 +6,7 @@ import { themeInitScript } from "@/lib/theme";
 import { AppShell } from "@/components/nav";
 import PwaRegister from "@/components/PwaRegister";
 import AuthSync from "@/components/AuthSync";
+import AuthGate from "@/components/AuthGate";
 import { brand } from "@/lib/brand";
 
 const fraunces = Fraunces({
@@ -67,7 +68,9 @@ export default function RootLayout({
       <body className="min-h-dvh antialiased" suppressHydrationWarning>
         <PwaRegister />
         <AuthSync />
-        <AppShell>{children}</AppShell>
+        <AuthGate>
+          <AppShell>{children}</AppShell>
+        </AuthGate>
       </body>
     </html>
   );
