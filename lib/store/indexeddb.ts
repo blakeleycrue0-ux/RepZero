@@ -12,16 +12,20 @@ import type {
   AppData,
 } from "./types";
 
-const DB_NAME = "repsette";
+// Each collection gets its own IndexedDB database. idb-keyval's createStore
+// only creates an object store during that database's initial upgrade, so
+// reusing one DB name across multiple createStore() calls silently drops
+// every store after the first — separate DB names sidestep that entirely.
+const DB_PREFIX = "repsette";
 
-const profileStore = createStore(DB_NAME, "profile");
-const scanStore = createStore(DB_NAME, "scans");
-const planStore = createStore(DB_NAME, "plans");
-const scheduleStore = createStore(DB_NAME, "schedule");
-const habitStore = createStore(DB_NAME, "habits");
-const habitLogStore = createStore(DB_NAME, "habitLogs");
-const threadStore = createStore(DB_NAME, "threads");
-const nutritionPlanStore = createStore(DB_NAME, "nutritionPlans");
+const profileStore = createStore(`${DB_PREFIX}-profile`, "profile");
+const scanStore = createStore(`${DB_PREFIX}-scans`, "scans");
+const planStore = createStore(`${DB_PREFIX}-plans`, "plans");
+const scheduleStore = createStore(`${DB_PREFIX}-schedule`, "schedule");
+const habitStore = createStore(`${DB_PREFIX}-habits`, "habits");
+const habitLogStore = createStore(`${DB_PREFIX}-habitLogs`, "habitLogs");
+const threadStore = createStore(`${DB_PREFIX}-threads`, "threads");
+const nutritionPlanStore = createStore(`${DB_PREFIX}-nutritionPlans`, "nutritionPlans");
 
 const PROFILE_KEY = "current";
 const SCHEDULE_KEY = "current";
