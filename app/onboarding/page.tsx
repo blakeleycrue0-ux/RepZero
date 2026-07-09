@@ -266,7 +266,7 @@ export default function OnboardingPage() {
                 )}
               </span>
               <span className="text-[14px] leading-relaxed">
-                I confirm I am 18 years of age or older, and I understand {brand.name}&rsquo;s
+                I confirm I am 18 years of age or older, and I understand {brand.name}’s
                 body scan and nutrition guidance are informational estimates, not medical advice.
               </span>
             </button>

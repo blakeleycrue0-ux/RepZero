@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { themeInitScript } from "@/lib/theme";
 import { AppShell } from "@/components/nav";
+import PwaRegister from "@/components/PwaRegister";
 import { brand } from "@/lib/brand";
 
 const fraunces = Fraunces({
@@ -31,6 +32,13 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: brand.name,
   },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -56,6 +64,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-dvh antialiased" suppressHydrationWarning>
+        <PwaRegister />
         <AppShell>{children}</AppShell>
       </body>
     </html>

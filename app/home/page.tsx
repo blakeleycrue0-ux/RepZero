@@ -124,7 +124,7 @@ export default function HomePage() {
           ) : (
             <div className="mt-3">
               <p className="text-[14px] text-text-secondary">
-                You don&rsquo;t have a plan yet. Generate one from your profile — or scan first for a
+                You don’t have a plan yet. Generate one from your profile — or scan first for a
                 plan built around what needs the most work.
               </p>
               <div className="mt-4 flex gap-3">
