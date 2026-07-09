@@ -5,6 +5,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 import LandingRedirect from "@/components/LandingRedirect";
 import Logo from "@/components/Logo";
 import { IconCheck } from "@/components/icons";
+import { supabaseEnabled } from "@/lib/supabase/config";
+
+const startHref = supabaseEnabled ? "/login" : "/onboarding";
 
 export const metadata: Metadata = {
   title: `${brand.name} — ${brand.tagline}`,
@@ -37,7 +40,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <Link
-            href="/onboarding"
+            href={startHref}
             className="rounded-full border border-border-strong px-4 py-1.5 text-[13px] font-medium transition-colors hover:border-text-primary"
           >
             Start
@@ -62,7 +65,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href="/onboarding"
+                href={startHref}
                 className="rounded-full bg-surface-inverse px-6 py-3 text-[14px] font-medium text-text-inverse transition-transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 Start your scan
@@ -110,7 +113,9 @@ export default function LandingPage() {
           </div>
           <ul className="flex flex-col gap-4">
             {[
-              "Local-first: usable with zero account, zero setup.",
+              supabaseEnabled
+                ? "One free account — no password, just an email link."
+                : "Local-first: usable with zero account, zero setup.",
               "developing / solid / strong — never a red flag.",
               "One AI coach, personalized to your plan and profile.",
               "Nutrition guidance that stays sustainable, never restrictive.",

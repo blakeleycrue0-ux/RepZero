@@ -44,7 +44,10 @@ function isActive(pathname: string, href: string) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideChrome =
-    pathname === "/" || pathname.startsWith("/onboarding");
+    pathname === "/" ||
+    pathname.startsWith("/onboarding") ||
+    pathname === "/login" ||
+    pathname.startsWith("/auth/");
 
   if (hideChrome) {
     return <>{children}</>;

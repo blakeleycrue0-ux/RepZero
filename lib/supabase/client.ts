@@ -1,11 +1,12 @@
 "use client";
 
 import { createClient, type Session } from "@supabase/supabase-js";
+import { supabaseEnabled } from "./config";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabaseEnabled = Boolean(url && anonKey);
+export { supabaseEnabled };
 
 // Browser-only client. Auth state lives in localStorage via the SDK, same
 // spirit as the rest of this app's local-first design — no server session
