@@ -46,10 +46,18 @@ export interface MuscleGroupRating {
   note: string;
 }
 
+export type BodyCompositionEstimate = "lean" | "moderate" | "higher";
+
+export interface BodyComposition {
+  estimate: BodyCompositionEstimate;
+  note: string;
+}
+
 export interface ScanResult {
   id: string;
   createdAt: string;
   groups: MuscleGroupRating[];
+  bodyComposition: BodyComposition | null;
   summary: string;
   topPriorities: MuscleGroupId[];
 }

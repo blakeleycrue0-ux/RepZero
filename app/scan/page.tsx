@@ -6,7 +6,7 @@ import { getStore } from "@/lib/store";
 import type { ScanResult } from "@/lib/store/types";
 import { newId } from "@/lib/id";
 import { fileToResizedDataUrl } from "@/lib/image";
-import { PrimaryButton, SecondaryButton, Spinner, Card } from "@/components/ui";
+import { PrimaryButton, SecondaryButton, Spinner, Card, Tag } from "@/components/ui";
 import { IconCamera, IconUpload, IconClose, IconLock } from "@/components/icons";
 import BodyMapPanel from "@/components/bodymap/BodyMapPanel";
 
@@ -77,9 +77,38 @@ function ScanResultView({ scan, onRescan }: { scan: ScanResult; onRescan: () => 
         <h2 className="text-[12px] font-medium uppercase tracking-wide text-text-tertiary">Overview</h2>
         <p className="mt-2 text-[14px] leading-relaxed">{scan.summary}</p>
         <p className="mt-4 text-[12px] leading-relaxed text-text-tertiary">
-          A visual estimate for motivation, not a medical or body-composition assessment.
+          A visual estimate for motivation, not a precise medical measurement.
         </p>
       </Card>
+
+      {scan.bodyComposition && (
+        <Card className="mt-4 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[12px] font-medium uppercase tracking-wide text-text-tertiary">
+              Body composition
+            </h2>
+            <Tag
+              tone={
+                scan.bodyComposition.estimate === "lean"
+                  ? "strong"
+                  : scan.bodyComposition.estimate === "moderate"
+                    ? "solid"
+                    : "developing"
+              }
+            >
+              {scan.bodyComposition.estimate === "lean"
+                ? "Lean"
+                : scan.bodyComposition.estimate === "moderate"
+                  ? "Moderate"
+                  : "Higher"}
+            </Tag>
+          </div>
+          <p className="mt-2 text-[14px] leading-relaxed">{scan.bodyComposition.note}</p>
+          <p className="mt-4 text-[12px] leading-relaxed text-text-tertiary">
+            A visual estimate only — not a body-fat scan, DEXA, or medical assessment.
+          </p>
+        </Card>
+      )}
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link href="/plan" className="flex-1">
@@ -139,6 +168,7 @@ function ScanCapture({
         id: newId(),
         createdAt: new Date().toISOString(),
         groups: data.groups,
+        bodyComposition: data.bodyComposition ?? null,
         summary: data.summary,
         topPriorities: data.topPriorities,
       };

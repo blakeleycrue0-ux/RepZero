@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
 
     const parsed = extractJson(text) as {
       groups?: { id: string; rating: string; note: string }[];
+      bodyComposition?: { estimate: string; note: string };
       summary?: string;
       top_priorities?: string[];
     };
@@ -82,9 +83,15 @@ export async function POST(req: NextRequest) {
       throw new Error("Model returned an incomplete set of muscle groups");
     }
 
+    const bodyComposition =
+      parsed.bodyComposition && ["lean", "moderate", "higher"].includes(parsed.bodyComposition.estimate)
+        ? parsed.bodyComposition
+        : null;
+
     logAiRequest({ route: "body-scan", clientId, status: 200, ms: Date.now() - start });
     return NextResponse.json({
       groups,
+      bodyComposition,
       summary: parsed.summary ?? "",
       topPriorities: (parsed.top_priorities ?? []).filter((p) => validGroups.has(p as (typeof MUSCLE_GROUPS)[number])),
     });
