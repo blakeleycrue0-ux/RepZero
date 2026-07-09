@@ -9,6 +9,7 @@ import { Card, SecondaryButton, Spinner } from "@/components/ui";
 import ThemeToggle from "@/components/ThemeToggle";
 import { installAvailable, onInstallAvailable, promptInstall } from "@/lib/pwaInstall";
 import { brand } from "@/lib/brand";
+import AccountCard from "@/components/AccountCard";
 
 const GOAL_LABELS: Record<string, string> = {
   build_muscle: "Build muscle",
@@ -74,6 +75,8 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-lg px-6 py-8 md:py-12">
       <h1 className="font-display text-3xl">Settings</h1>
+
+      <AccountCard />
 
       {profile && (
         <Card className="mt-6 p-5">
