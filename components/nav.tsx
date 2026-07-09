@@ -36,8 +36,6 @@ const SECONDARY: NavItem[] = [
   { href: "/progress", label: "Progress", icon: IconProgress },
 ];
 
-const CHROMELESS_PREFIXES = ["/onboarding", "/"];
-
 function isActive(pathname: string, href: string) {
   if (href === "/home") return pathname === "/home";
   return pathname === href || pathname.startsWith(href + "/");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getStore } from "@/lib/store";
 import type { Habit, HabitLog } from "@/lib/store/types";
 import { newId, todayKey } from "@/lib/id";
@@ -171,7 +171,7 @@ function MonthHeatmap({ habits, logs }: { habits: Habit[]; logs: HabitLog[] }) {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  const map = useMemo(() => monthCompletionMap(habits, logs, year, month), [habits, logs, year, month]);
+  const map = monthCompletionMap(habits, logs, year, month);
 
   const firstOfMonth = new Date(year, month, 1);
   const leadingBlanks = (firstOfMonth.getDay() + 6) % 7; // Monday-first

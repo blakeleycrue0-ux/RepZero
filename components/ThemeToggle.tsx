@@ -7,6 +7,10 @@ export default function ThemeToggle() {
   const [theme, setLocalTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
+    // Reads the class the inline theme-init script set on <html> before
+    // paint — genuinely a one-time client-only external read, not derivable
+    // during render (SSR has no DOM to check).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTheme(getTheme());
   }, []);
 

@@ -6,7 +6,7 @@ import { getStore } from "@/lib/store";
 import type { Habit, HabitLog, ScanResult, MuscleRating } from "@/lib/store/types";
 import { currentStreak } from "@/lib/habits";
 import { drawScanCard, drawStatCard, drawComparisonCard, shareOrDownload } from "@/lib/sharecard";
-import { Card, PrimaryButton, SecondaryButton, EmptyState, Spinner } from "@/components/ui";
+import { Card, PrimaryButton, EmptyState, Spinner } from "@/components/ui";
 import { IconShare } from "@/components/icons";
 import { brand } from "@/lib/brand";
 

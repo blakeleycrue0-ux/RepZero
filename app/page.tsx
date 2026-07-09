@@ -96,7 +96,7 @@ export default function LandingPage() {
               Your photos are analyzed and instantly discarded.
             </h3>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-text-secondary">
-              We never store or view your images. They're processed in memory to generate
+              We never store or view your images. They’re processed in memory to generate
               your muscle-group ratings, then the buffer is discarded the moment the
               analysis returns — nothing touches a disk, nothing goes to a database.
             </p>

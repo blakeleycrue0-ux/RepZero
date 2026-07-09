@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { MuscleGroupId, MuscleRating } from "@/lib/store/types";
 import { RATING_COLOR_VAR } from "@/lib/muscle-labels";
 

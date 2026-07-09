@@ -32,6 +32,7 @@ export default function SettingsPage() {
         setProfile(p);
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads a module-level flag set by a prior browser event
     setCanInstall(installAvailable());
     return onInstallAvailable(() => setCanInstall(true));
   }, []);

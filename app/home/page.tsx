@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getStore } from "@/lib/store";
 import type { Habit, HabitLog, ScanResult, ScheduleSlot, WorkoutPlan, Profile } from "@/lib/store/types";
-import { todayKey, newId } from "@/lib/id";
+import { todayKey } from "@/lib/id";
 import { tipOfTheDay } from "@/lib/tips";
 import { MUSCLE_LABELS, RATING_TAG_TONE } from "@/lib/muscle-labels";
 import { Card, EmptyState, Tag, PrimaryButton, Spinner } from "@/components/ui";
@@ -41,6 +41,9 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    // Initial load from IndexedDB — an external system with no render-time
+    // equivalent, so syncing it into state here is the intended pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load().then(() => {
       getStore()
         .getProfile()

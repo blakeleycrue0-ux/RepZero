@@ -27,7 +27,11 @@ export default function ScheduleView({
   const [remindersOn, setRemindersOn] = useState(false);
 
   useEffect(() => {
+    // Notification.permission is a browser API read, and rescheduling
+    // timers is a side effect on an external system (setTimeout) — both
+    // belong here, not in render.
     if (notificationsSupported() && Notification.permission === "granted") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRemindersOn(true);
       scheduleUpcomingReminders(schedule, plan);
     }

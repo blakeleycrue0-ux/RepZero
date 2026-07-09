@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Repsette
 
-## Getting Started
+An AI-powered fitness companion: scan your physique for an honest per-muscle-group readout,
+get an AI-generated workout plan and weekly schedule, nutrition guidance, a habit tracker,
+gym reminders, and an ask-me-anything gym coach.
 
-First, run the development server:
+"Repsette" is a working title — swap it in `lib/brand.ts`.
+
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind v4
+- Local-first data layer (IndexedDB via `idb-keyval`) behind a swappable `DataStore` interface
+  (`lib/store/`) — no account or server database required to use the app
+- Server-only API routes (`app/api/*/route.ts`) proxy to the Anthropic API; the browser never
+  sees the API key
+- PWA: installable, offline shell, best-effort local reminders + `.ics` calendar export
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env.local   # then fill in ANTHROPIC_API_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Onboarding walks you through a profile,
+then the app is fully usable in local mode — everything is stored in your browser's
+IndexedDB.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable            | Required | Notes                                                   |
+| -------------------- | -------- | -------------------------------------------------------- |
+| `ANTHROPIC_API_KEY`  | Yes      | Server-only. Powers body scan, plan, nutrition, and chat. |
 
-## Learn More
+## AI routes
 
-To learn more about Next.js, take a look at the following resources:
+All AI calls go through server-side route handlers, never directly from the client:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `POST /api/body-scan` — vision analysis of up to 3 photos → muscle-group ratings JSON. Photos
+  are held in memory only for the duration of the request and are never written to disk or a
+  database.
+- `POST /api/plan` — structured weekly workout plan JSON
+- `POST /api/nutrition` — structured daily nutrition guidance JSON
+- `POST /api/coach` — streamed gym-coach chat
+- `POST /api/nutrition-chat` — streamed nutrition swap chat
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Each route rate-limits per client IP (best-effort, in-memory) and logs request metadata only
+(never photo or message content) — see `lib/ai/ratelimit.ts`.
 
-## Deploy on Vercel
+## Project layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/                  routes (App Router)
+  api/                 server-only AI proxy routes
+  onboarding/          profile setup
+  scan/                body scan capture + results
+  plan/                workout plan + weekly schedule
+  coach/, nutrition/    AI chat surfaces
+  habits/              habit tracker
+  progress/            scan history + shareable progress cards
+  legal/               privacy, terms, how-the-AI-works
+  settings/            export/delete data, theme, install
+lib/
+  store/                DataStore interface + IndexedDB implementation + shared types
+  ai/                   Anthropic client, prompts, rate limiting
+components/            shared UI, nav, body map SVG, chat
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `DECISIONS.md` for choices made where the brief left something open.
+
+## Build
+
+```bash
+npm run build
+npm run lint
+```
+
+## Deploy
+
+Any Next.js host works (Vercel, Netlify, etc.) — set `ANTHROPIC_API_KEY` in the environment.
+There's no database to provision; data lives in each user's browser.
