@@ -7,12 +7,17 @@ import type { ChatMessage, NutritionPlan, Profile } from "@/lib/store/types";
 import { newId } from "@/lib/id";
 import { PrimaryButton, SecondaryButton, Spinner, Card, EmptyState, Tag } from "@/components/ui";
 import Chat from "@/components/Chat";
+import { WEEKDAY_NAMES } from "@/lib/schedule";
 
 const SUGGESTIONS = [
   "Can I swap the breakfast for something quicker?",
   "What can I eat instead if I don't like fish?",
   "Is this enough protein for my goal?",
 ];
+
+function todayWeekdayIndex() {
+  return (new Date().getDay() + 6) % 7; // Monday = 0
+}
 
 export default function NutritionPage() {
   const [loading, setLoading] = useState(true);
@@ -22,6 +27,7 @@ export default function NutritionPage() {
   const [plan, setPlan] = useState<NutritionPlan | null>(null);
   const [thread, setThread] = useState<ChatMessage[]>([]);
   const [tab, setTab] = useState<"guidance" | "chat">("guidance");
+  const [dayIndex, setDayIndex] = useState(todayWeekdayIndex());
 
   useEffect(() => {
     const store = getStore();
@@ -57,11 +63,12 @@ export default function NutritionPage() {
         maintenanceCalories: data.maintenanceCalories,
         calorieStrategy: data.calorieStrategy,
         macros: data.macros,
-        meals: data.meals,
+        days: data.days,
         notes: data.notes,
       };
       await getStore().saveNutritionPlan(newPlan);
       setPlan(newPlan);
+      setDayIndex(todayWeekdayIndex());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -124,12 +131,12 @@ export default function NutritionPage() {
           {generating ? (
             <div className="flex flex-col items-center gap-3 py-16 text-center">
               <Spinner className="text-text-tertiary" />
-              <p className="text-[13px] text-text-secondary">Building balanced guidance for your goal…</p>
+              <p className="text-[13px] text-text-secondary">Building a full week of guidance for your goal…</p>
             </div>
           ) : !plan ? (
             <EmptyState
               title="No guidance yet"
-              description="Generate a day of balanced meal guidance aligned to your goal and dietary pattern."
+              description="Generate a full week of balanced meal guidance aligned to your goal and dietary pattern."
               action={<PrimaryButton onClick={generate}>Generate guidance</PrimaryButton>}
             />
           ) : (
@@ -171,8 +178,24 @@ export default function NutritionPage() {
                 </div>
               )}
 
-              <div className="mt-6 flex flex-col gap-3">
-                {plan.meals.map((meal, i) => (
+              <div className="mt-5 flex gap-1.5 overflow-x-auto pb-1">
+                {WEEKDAY_NAMES.map((name, i) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => setDayIndex(i)}
+                    className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+                      dayIndex === i ? "bg-surface-inverse text-text-inverse" : "border border-border-subtle text-text-secondary"
+                    }`}
+                  >
+                    {name.slice(0, 3)}
+                    {i === todayWeekdayIndex() && <span className="ml-1 text-[10px] opacity-70">•</span>}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3">
+                {(plan.days[dayIndex]?.meals ?? []).map((meal, i) => (
                   <Card key={i} className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-display text-lg">{meal.name}</p>

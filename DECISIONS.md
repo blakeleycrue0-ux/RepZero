@@ -16,6 +16,22 @@ generated app icons). IndexedDB database names also moved from `repsette-*` to `
 which resets local data for anyone who used the app during the brief Repsette-named window —
 an acceptable one-time cost this early, with no migration path built for it.
 
+## Accounts and sync
+
+Auth is Supabase email magic-link, as the brief specified. Architecture: IndexedDB stays the
+single source of truth the UI reads from (unchanged, still works fully offline/local-only);
+`SyncedStore` (`lib/supabase/sync.ts`) decorates the local store so every write also fires a
+best-effort, non-blocking upsert to Supabase when signed in — network failures never block the
+UI, they just log a warning. On sign-in, a one-time pull merges any remote rows not already
+present locally (by id/key) into IndexedDB, so a returning user or a new device gets their data
+back without clobbering local edits made while offline. This keeps the "local mode fully
+usable, account unlocks sync" contract from the brief rather than making Supabase a hard
+dependency.
+
+The schema (`supabase/schema.sql`) is meant to be run once via the Supabase SQL Editor rather
+than through a service-role key held by this codebase — every table is scoped by `auth.uid()`
+via row-level security, and the app only ever holds the public anon key client-side.
+
 ## Fonts
 
 Display: **Fraunces** (variable, opsz/SOFT/WONK axes) — a serif with real character, avoiding

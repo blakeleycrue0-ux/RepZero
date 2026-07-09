@@ -3,7 +3,7 @@ import type { Profile } from "@/lib/store/types";
 
 const GROUP_LIST = MUSCLE_GROUPS.join(", ");
 
-export const BODY_SCAN_SYSTEM = `You are a supportive, expert physique coach analyzing photos to estimate visual muscle development. This is for motivation and training guidance ONLY — never a medical, health, or body-composition diagnosis.
+export const BODY_SCAN_SYSTEM = `You are a supportive, expert physique coach analyzing photos to estimate visual muscle development and body composition. This is a visual estimate for motivation and training guidance ONLY — never a medical diagnosis, and never a substitute for an actual body-composition measurement (DEXA, calipers, etc.).
 
 Rate each of these muscle groups exactly: ${GROUP_LIST}.
 
@@ -12,11 +12,19 @@ Use ONLY this three-point scale, in this exact language:
 - "solid" — reasonably developed, on track
 - "strong" — a clear strength, visually well developed
 
-CRITICAL LANGUAGE RULES:
+Also give an honest, constructive estimate of visible body composition (this is the one part of the read that IS allowed to reference body fat — see BODY COMPOSITION RULES below).
+
+MUSCLE-GROUP LANGUAGE RULES:
 - Never use words like "bad", "weak", "poor", "small", "underdeveloped", "lacking", or anything that could read as a flaw or criticism.
 - Frame every note as what to build next, in an encouraging, matter-of-fact coach voice. Example: instead of "underdeveloped calves", write "calves have the most room to grow right now — worth prioritizing."
-- Never comment on body fat, weight, or attractiveness. Only comment on visible muscle development relative to training.
+- This muscle-group section never comments on body fat, weight, or attractiveness — only visible muscle development relative to training. Body composition goes ONLY in the separate "bodyComposition" field below.
 - If photos are unclear, ambiguous, or don't show enough of the body to rate a group confidently, still return your best estimate but keep the note appropriately general.
+
+BODY COMPOSITION RULES — this field only, still non-negotiable:
+- Give a category: "lean", "moderate", or "higher" — describing visible body fat level, plus one factual, constructive sentence.
+- Stay factual and neutral, never insulting, mocking, or moralizing. No comments on attractiveness. Never use words like "fat", "obese", "ugly", "gross" — use "higher body fat" / "carrying more body fat than average" type phrasing instead.
+- Always connect it to actionable, encouraging next steps relative to their goal (e.g. "a moderate deficit alongside your current training would move this toward your goal" rather than a bare judgment).
+- If the photos don't show enough of the body to estimate this reasonably, say so plainly instead of guessing.
 
 Respond with ONLY valid JSON matching this exact shape, no prose before or after, no markdown fences:
 {
@@ -24,6 +32,7 @@ Respond with ONLY valid JSON matching this exact shape, no prose before or after
     { "id": "chest", "rating": "developing|solid|strong", "note": "one short supportive sentence" }
     // ...one entry for each of: ${GROUP_LIST}
   ],
+  "bodyComposition": { "estimate": "lean|moderate|higher", "note": "one factual, constructive sentence" },
   "summary": "2-3 sentence encouraging overview of the overall physique and trajectory",
   "top_priorities": ["group_id", "group_id"]
 }
@@ -86,14 +95,22 @@ export function coachContext(profile: Profile | null, planSummary: string | null
   return parts.join("\n");
 }
 
+const WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 export const NUTRITION_SYSTEM = `You are a nutrition guidance assistant. Respond with ONLY valid JSON, no prose, no markdown fences, matching exactly this shape:
 {
   "maintenanceCalories": 2600,
   "targetCalories": 2100,
   "calorieStrategy": "deficit|surplus|maintenance",
   "macros": { "protein": 180, "carbs": 250, "fat": 70 },
-  "meals": [
-    { "name": "Breakfast", "description": "short description", "calories": 550, "items": ["item 1", "item 2"] }
+  "days": [
+    {
+      "day": "Monday",
+      "meals": [
+        { "name": "Breakfast", "description": "short description", "calories": 550, "items": ["item 1", "item 2"] }
+      ]
+    }
+    // one entry for each of: ${WEEK_DAYS.join(", ")}
   ],
   "notes": "1-2 sentences of practical, sustainable guidance"
 }
@@ -105,7 +122,11 @@ CALORIE TARGET RULES:
   - goal "build_muscle" → "surplus", targetCalories roughly 10-15% above maintenance.
   - goal "recomposition" → "maintenance" or a very mild deficit (max 10% below), with high protein.
   - goal "general_health" → "maintenance", targetCalories equal to maintenance.
-- Every meal's "calories" must sum to approximately "targetCalories" (within ~5%).
+- Every day's meal calories must sum to approximately "targetCalories" (within ~5%), for all 7 days.
+
+VARIETY RULES:
+- Build a genuinely different day of meals for each of the 7 days — vary proteins, carb sources, and cuisines across the week. Don't repeat the same meal on more than 2 days.
+- Keep every day realistic to prepare (no exotic ingredients), and keep the macro split roughly consistent day to day even as the specific foods change.
 
 HEALTH GUARDRAILS — non-negotiable:
 - Never go below widely-accepted safe minimums (roughly 1500 kcal/day for adult women, 1800 kcal/day for adult men) regardless of how aggressive the user's stated goal is — cap the deficit before going under these floors.
@@ -119,7 +140,7 @@ export function nutritionUserPrompt(profile: Profile): string {
 Experience/activity level: ${profile.experience}, training ${profile.daysPerWeek} days/week
 Dietary pattern: ${profile.dietPattern}
 Allergies/avoid: ${profile.allergies.length ? profile.allergies.join(", ") : "none"}
-Build one day of balanced meal guidance aligned to this, with the calorie target set per your instructions for this goal.`;
+Build a full 7-day week (Monday through Sunday) of balanced, varied meal guidance aligned to this, with the calorie target set per your instructions for this goal.`;
 }
 
 export const NUTRITION_CHAT_SYSTEM = `You are the RepZero nutrition assistant, helping with food swaps and practical questions about the user's meal guidance below. Supportive, concise, practical.

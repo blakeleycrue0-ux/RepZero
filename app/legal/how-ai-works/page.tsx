@@ -16,10 +16,12 @@ export default function HowAiWorksPage() {
         <p>
           Your photos are sent to Claude, Anthropic’s AI model, which estimates visible
           muscle development for ten muscle groups and returns a rating of developing, solid,
-          or strong for each — never a numeric score, never a comment on weight or body fat.
-          It’s a visual estimate meant to point you toward where to focus training next,
-          not a body-composition or medical measurement. Lighting, camera angle, clothing, and
-          photo quality all affect the read, and two scans of the same body can come back
+          or strong for each — never a numeric score, never a comment on your weight or
+          appearance. It also gives a general body-composition estimate (lean, moderate, or
+          higher) with a constructive note, kept factual and never judgmental. Both are visual
+          estimates meant to point you toward where to focus training and nutrition next, not a
+          precise body-composition or medical measurement. Lighting, camera angle, clothing,
+          and photo quality all affect the read, and two scans of the same body can come back
           slightly differently.
         </p>
       </section>

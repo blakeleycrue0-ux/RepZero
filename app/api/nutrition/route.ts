@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       model: MODELS.default,
       system: NUTRITION_SYSTEM,
       messages: [{ role: "user", content: nutritionUserPrompt(profile) }],
-      maxTokens: 1500,
+      maxTokens: 6000,
     });
 
     const parsed = extractJson(text) as {
@@ -39,11 +39,14 @@ export async function POST(req: NextRequest) {
       maintenanceCalories?: number;
       calorieStrategy?: string;
       macros?: { protein: number; carbs: number; fat: number };
-      meals?: { name: string; description: string; calories: number; items: string[] }[];
+      days?: {
+        day: string;
+        meals: { name: string; description: string; calories: number; items: string[] }[];
+      }[];
       notes?: string;
     };
 
-    if (!parsed.targetCalories || !parsed.macros || !parsed.meals?.length) {
+    if (!parsed.targetCalories || !parsed.macros || !parsed.days?.length) {
       throw new Error("Model returned incomplete nutrition guidance");
     }
 
@@ -57,7 +60,10 @@ export async function POST(req: NextRequest) {
       maintenanceCalories: parsed.maintenanceCalories ?? parsed.targetCalories,
       calorieStrategy: strategy,
       macros: parsed.macros,
-      meals: parsed.meals.map((m) => ({ ...m, calories: m.calories ?? 0 })),
+      days: parsed.days.map((d) => ({
+        day: d.day,
+        meals: (d.meals ?? []).map((m) => ({ ...m, calories: m.calories ?? 0 })),
+      })),
       notes: parsed.notes ?? "",
     });
   } catch (err) {

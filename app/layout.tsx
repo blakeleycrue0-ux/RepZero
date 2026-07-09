@@ -5,6 +5,7 @@ import "./globals.css";
 import { themeInitScript } from "@/lib/theme";
 import { AppShell } from "@/components/nav";
 import PwaRegister from "@/components/PwaRegister";
+import AuthSync from "@/components/AuthSync";
 import { brand } from "@/lib/brand";
 
 const fraunces = Fraunces({
@@ -65,6 +66,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-dvh antialiased" suppressHydrationWarning>
         <PwaRegister />
+        <AuthSync />
         <AppShell>{children}</AppShell>
       </body>
     </html>
