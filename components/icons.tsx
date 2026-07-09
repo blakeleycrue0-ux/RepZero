@@ -105,8 +105,10 @@ export function IconMore(props: IconProps) {
 export function IconSettings(props: IconProps) {
   return (
     <svg {...base} {...props}>
-      <circle cx="12" cy="12" r="2.8" />
-      <path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M17.7 6.3l-1.5 1.5M7.8 16.2l-1.5 1.5M17.7 17.7l-1.5-1.5M7.8 7.8 6.3 6.3" />
+      <path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h13M21 18h-1" />
+      <circle cx="13" cy="6" r="2.1" />
+      <circle cx="7" cy="12" r="2.1" />
+      <circle cx="18" cy="18" r="2.1" />
     </svg>
   );
 }
