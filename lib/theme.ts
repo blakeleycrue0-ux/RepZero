@@ -1,4 +1,4 @@
-export const THEME_STORAGE_KEY = "repsette:theme";
+export const THEME_STORAGE_KEY = "repzero:theme";
 
 export type Theme = "light" | "dark";
 

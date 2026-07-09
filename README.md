@@ -1,10 +1,10 @@
-# Repsette
+# RepZero
 
 An AI-powered fitness companion: scan your physique for an honest per-muscle-group readout,
 get an AI-generated workout plan and weekly schedule, nutrition guidance, a habit tracker,
 gym reminders, and an ask-me-anything gym coach.
 
-"Repsette" is a working title — swap it in `lib/brand.ts`.
+Brand name and logo live in `lib/brand.ts` — swap them there to re-brand.
 
 ## Stack
 

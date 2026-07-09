@@ -207,7 +207,6 @@ function ScanCapture({
               }}
               type="file"
               accept="image/*"
-              capture="user"
               className="hidden"
               onChange={(e) => handleFile(slot.key, e.target.files?.[0])}
             />

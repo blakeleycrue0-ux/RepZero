@@ -36,8 +36,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = extractJson(text) as {
       targetCalories?: number;
+      maintenanceCalories?: number;
+      calorieStrategy?: string;
       macros?: { protein: number; carbs: number; fat: number };
-      meals?: { name: string; description: string; items: string[] }[];
+      meals?: { name: string; description: string; calories: number; items: string[] }[];
       notes?: string;
     };
 
@@ -45,11 +47,17 @@ export async function POST(req: NextRequest) {
       throw new Error("Model returned incomplete nutrition guidance");
     }
 
+    const strategy = ["deficit", "surplus", "maintenance"].includes(parsed.calorieStrategy ?? "")
+      ? (parsed.calorieStrategy as "deficit" | "surplus" | "maintenance")
+      : "maintenance";
+
     logAiRequest({ route: "nutrition", clientId, status: 200, ms: Date.now() - start });
     return NextResponse.json({
       targetCalories: parsed.targetCalories,
+      maintenanceCalories: parsed.maintenanceCalories ?? parsed.targetCalories,
+      calorieStrategy: strategy,
       macros: parsed.macros,
-      meals: parsed.meals,
+      meals: parsed.meals.map((m) => ({ ...m, calories: m.calories ?? 0 })),
       notes: parsed.notes ?? "",
     });
   } catch (err) {

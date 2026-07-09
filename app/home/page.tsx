@@ -4,12 +4,14 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getStore } from "@/lib/store";
-import type { Habit, HabitLog, ScanResult, ScheduleSlot, WorkoutPlan, Profile } from "@/lib/store/types";
+import type { Habit, HabitLog, ScanResult, ScheduleSlot, WorkoutPlan, Profile, WaterLog } from "@/lib/store/types";
 import { todayKey } from "@/lib/id";
 import { tipOfTheDay } from "@/lib/tips";
 import { MUSCLE_LABELS, RATING_TAG_TONE } from "@/lib/muscle-labels";
 import { Card, EmptyState, Tag, PrimaryButton, Spinner } from "@/components/ui";
 import { IconCheck, IconCoach, IconFlame } from "@/components/icons";
+import WaterTracker from "@/components/WaterTracker";
+import { CUP_ML } from "@/lib/water";
 
 export default function HomePage() {
   const router = useRouter();
@@ -20,16 +22,18 @@ export default function HomePage() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [logs, setLogs] = useState<HabitLog[]>([]);
   const [scan, setScan] = useState<ScanResult | null>(null);
+  const [waterLogs, setWaterLogs] = useState<WaterLog[]>([]);
 
   const load = useCallback(async () => {
     const store = getStore();
-    const [p, pl, sc, hs, lg, scans] = await Promise.all([
+    const [p, pl, sc, hs, lg, scans, wl] = await Promise.all([
       store.getProfile(),
       store.latestPlan(),
       store.getSchedule(),
       store.listHabits(),
       store.listHabitLogs(),
       store.listScans(),
+      store.listWaterLogs(),
     ]);
     setProfile(p);
     setPlan(pl);
@@ -37,6 +41,7 @@ export default function HomePage() {
     setHabits(hs.filter((h) => !h.archived));
     setLogs(lg);
     setScan(scans[0] ?? null);
+    setWaterLogs(wl);
     setLoading(false);
   }, []);
 
@@ -62,6 +67,14 @@ export default function HomePage() {
       const rest = prev.filter((l) => !(l.habitId === habitId && l.date === date));
       return [...rest, next];
     });
+  }
+
+  async function setWaterCups(cups: number) {
+    const date = todayKey();
+    const ml = Math.max(0, cups) * CUP_ML;
+    const next: WaterLog = { date, ml };
+    await getStore().setWaterLog(next);
+    setWaterLogs((prev) => [...prev.filter((l) => l.date !== date), next]);
   }
 
   if (loading) {
@@ -228,6 +241,18 @@ export default function HomePage() {
               </Link>
             </div>
           )}
+        </Card>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <Card className="p-6 md:col-span-2">
+          <h2 className="text-[12px] font-medium uppercase tracking-wide text-text-tertiary">Water</h2>
+          <div className="mt-3">
+            <WaterTracker
+              totalMl={waterLogs.find((l) => l.date === todayKey())?.ml ?? 0}
+              onSetCups={setWaterCups}
+            />
+          </div>
         </Card>
       </div>
     </div>

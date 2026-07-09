@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getStore } from "@/lib/store";
 import type { ChatMessage, NutritionPlan, Profile } from "@/lib/store/types";
 import { newId } from "@/lib/id";
-import { PrimaryButton, SecondaryButton, Spinner, Card, EmptyState } from "@/components/ui";
+import { PrimaryButton, SecondaryButton, Spinner, Card, EmptyState, Tag } from "@/components/ui";
 import Chat from "@/components/Chat";
 
 const SUGGESTIONS = [
@@ -54,6 +54,8 @@ export default function NutritionPage() {
         id: newId(),
         createdAt: new Date().toISOString(),
         targetCalories: data.targetCalories,
+        maintenanceCalories: data.maintenanceCalories,
+        calorieStrategy: data.calorieStrategy,
         macros: data.macros,
         meals: data.meals,
         notes: data.notes,
@@ -132,8 +134,8 @@ export default function NutritionPage() {
             />
           ) : (
             <>
-              <div className="flex items-center justify-between">
-                <div className="flex gap-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex flex-wrap gap-6">
                   <Stat label="Calories" value={plan.targetCalories} />
                   <Stat label="Protein" value={`${plan.macros.protein}g`} />
                   <Stat label="Carbs" value={`${plan.macros.carbs}g`} />
@@ -144,10 +146,42 @@ export default function NutritionPage() {
                 </SecondaryButton>
               </div>
 
+              {plan.calorieStrategy && (
+                <div className="mt-3 flex items-center gap-2">
+                  <Tag
+                    tone={
+                      plan.calorieStrategy === "deficit"
+                        ? "developing"
+                        : plan.calorieStrategy === "surplus"
+                          ? "solid"
+                          : "neutral"
+                    }
+                  >
+                    {plan.calorieStrategy === "deficit"
+                      ? "Calorie deficit"
+                      : plan.calorieStrategy === "surplus"
+                        ? "Calorie surplus"
+                        : "Maintenance"}
+                  </Tag>
+                  {plan.maintenanceCalories > 0 && (
+                    <span className="text-[12px] text-text-tertiary">
+                      ~{plan.maintenanceCalories} cal estimated maintenance
+                    </span>
+                  )}
+                </div>
+              )}
+
               <div className="mt-6 flex flex-col gap-3">
                 {plan.meals.map((meal, i) => (
                   <Card key={i} className="p-5">
-                    <p className="font-display text-lg">{meal.name}</p>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-display text-lg">{meal.name}</p>
+                      {meal.calories > 0 && (
+                        <span className="shrink-0 text-[12px] tabular-nums text-text-tertiary">
+                          {meal.calories} cal
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-[13px] text-text-secondary">{meal.description}</p>
                     <ul className="mt-3 flex flex-col gap-1">
                       {meal.items.map((item, j) => (

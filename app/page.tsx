@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { brand } from "@/lib/brand";
 import ThemeToggle from "@/components/ThemeToggle";
 import LandingRedirect from "@/components/LandingRedirect";
+import Logo from "@/components/Logo";
 import { IconCheck } from "@/components/icons";
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function LandingPage() {
     <div className="min-h-dvh bg-surface-0 text-text-primary">
       <LandingRedirect />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 md:px-10">
-        <span className="font-display text-lg tracking-tight">{brand.name}</span>
+        <Logo size={24} />
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <Link

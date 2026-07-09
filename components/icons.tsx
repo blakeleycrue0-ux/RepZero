@@ -201,6 +201,38 @@ export function IconLock(props: IconProps) {
   );
 }
 
+export function IconCupFilled(props: IconProps & { fillLevel?: number }) {
+  const { fillLevel = 1, ...rest } = props;
+  const clipY = 20 - fillLevel * 15.5;
+  return (
+    <svg {...base} fill="none" {...rest}>
+      <defs>
+        <clipPath id={`cup-clip-${Math.round(fillLevel * 100)}`}>
+          <rect x="0" y={clipY} width="24" height="24" />
+        </clipPath>
+      </defs>
+      <path
+        d="M6 4h12l-1.3 14.5a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.8Z"
+        fill="currentColor"
+        fillOpacity={0.18}
+      />
+      {fillLevel > 0 && (
+        <path
+          d="M6 4h12l-1.3 14.5a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.8Z"
+          fill="currentColor"
+          clipPath={`url(#cup-clip-${Math.round(fillLevel * 100)})`}
+        />
+      )}
+      <path
+        d="M6 4h12l-1.3 14.5a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.8Z"
+        stroke="currentColor"
+        strokeWidth={1.6}
+      />
+      <path d="M6 4h12" stroke="currentColor" strokeWidth={2} />
+    </svg>
+  );
+}
+
 export function IconBell(props: IconProps) {
   return (
     <svg {...base} {...props}>
