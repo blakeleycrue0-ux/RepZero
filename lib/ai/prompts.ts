@@ -86,14 +86,22 @@ export function coachContext(profile: Profile | null, planSummary: string | null
   return parts.join("\n");
 }
 
+const WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 export const NUTRITION_SYSTEM = `You are a nutrition guidance assistant. Respond with ONLY valid JSON, no prose, no markdown fences, matching exactly this shape:
 {
   "maintenanceCalories": 2600,
   "targetCalories": 2100,
   "calorieStrategy": "deficit|surplus|maintenance",
   "macros": { "protein": 180, "carbs": 250, "fat": 70 },
-  "meals": [
-    { "name": "Breakfast", "description": "short description", "calories": 550, "items": ["item 1", "item 2"] }
+  "days": [
+    {
+      "day": "Monday",
+      "meals": [
+        { "name": "Breakfast", "description": "short description", "calories": 550, "items": ["item 1", "item 2"] }
+      ]
+    }
+    // one entry for each of: ${WEEK_DAYS.join(", ")}
   ],
   "notes": "1-2 sentences of practical, sustainable guidance"
 }
@@ -105,7 +113,11 @@ CALORIE TARGET RULES:
   - goal "build_muscle" → "surplus", targetCalories roughly 10-15% above maintenance.
   - goal "recomposition" → "maintenance" or a very mild deficit (max 10% below), with high protein.
   - goal "general_health" → "maintenance", targetCalories equal to maintenance.
-- Every meal's "calories" must sum to approximately "targetCalories" (within ~5%).
+- Every day's meal calories must sum to approximately "targetCalories" (within ~5%), for all 7 days.
+
+VARIETY RULES:
+- Build a genuinely different day of meals for each of the 7 days — vary proteins, carb sources, and cuisines across the week. Don't repeat the same meal on more than 2 days.
+- Keep every day realistic to prepare (no exotic ingredients), and keep the macro split roughly consistent day to day even as the specific foods change.
 
 HEALTH GUARDRAILS — non-negotiable:
 - Never go below widely-accepted safe minimums (roughly 1500 kcal/day for adult women, 1800 kcal/day for adult men) regardless of how aggressive the user's stated goal is — cap the deficit before going under these floors.
@@ -119,7 +131,7 @@ export function nutritionUserPrompt(profile: Profile): string {
 Experience/activity level: ${profile.experience}, training ${profile.daysPerWeek} days/week
 Dietary pattern: ${profile.dietPattern}
 Allergies/avoid: ${profile.allergies.length ? profile.allergies.join(", ") : "none"}
-Build one day of balanced meal guidance aligned to this, with the calorie target set per your instructions for this goal.`;
+Build a full 7-day week (Monday through Sunday) of balanced, varied meal guidance aligned to this, with the calorie target set per your instructions for this goal.`;
 }
 
 export const NUTRITION_CHAT_SYSTEM = `You are the RepZero nutrition assistant, helping with food swaps and practical questions about the user's meal guidance below. Supportive, concise, practical.

@@ -4,12 +4,21 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getStore } from "@/lib/store";
-import type { Habit, HabitLog, ScanResult, ScheduleSlot, WorkoutPlan, Profile, WaterLog } from "@/lib/store/types";
+import type {
+  Habit,
+  HabitLog,
+  ScanResult,
+  ScheduleSlot,
+  WorkoutPlan,
+  Profile,
+  WaterLog,
+  NutritionPlan,
+} from "@/lib/store/types";
 import { todayKey } from "@/lib/id";
 import { tipOfTheDay } from "@/lib/tips";
 import { MUSCLE_LABELS, RATING_TAG_TONE } from "@/lib/muscle-labels";
 import { Card, EmptyState, Tag, PrimaryButton, Spinner } from "@/components/ui";
-import { IconCheck, IconCoach, IconFlame } from "@/components/icons";
+import { IconCheck, IconCoach, IconFlame, IconNutrition } from "@/components/icons";
 import WaterTracker from "@/components/WaterTracker";
 import { CUP_ML } from "@/lib/water";
 
@@ -23,10 +32,11 @@ export default function HomePage() {
   const [logs, setLogs] = useState<HabitLog[]>([]);
   const [scan, setScan] = useState<ScanResult | null>(null);
   const [waterLogs, setWaterLogs] = useState<WaterLog[]>([]);
+  const [nutritionPlan, setNutritionPlan] = useState<NutritionPlan | null>(null);
 
   const load = useCallback(async () => {
     const store = getStore();
-    const [p, pl, sc, hs, lg, scans, wl] = await Promise.all([
+    const [p, pl, sc, hs, lg, scans, wl, nps] = await Promise.all([
       store.getProfile(),
       store.latestPlan(),
       store.getSchedule(),
@@ -34,6 +44,7 @@ export default function HomePage() {
       store.listHabitLogs(),
       store.listScans(),
       store.listWaterLogs(),
+      store.listNutritionPlans(),
     ]);
     setProfile(p);
     setPlan(pl);
@@ -42,6 +53,7 @@ export default function HomePage() {
     setLogs(lg);
     setScan(scans[0] ?? null);
     setWaterLogs(wl);
+    setNutritionPlan(nps[0] ?? null);
     setLoading(false);
   }, []);
 
@@ -94,6 +106,7 @@ export default function HomePage() {
   const hour = today.getHours();
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
   const doneToday = logs.filter((l) => l.date === todayKey() && l.done).length;
+  const todayMeals = nutritionPlan?.days[todayIndex]?.meals ?? null;
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-8 md:px-10 md:py-12">
@@ -246,6 +259,39 @@ export default function HomePage() {
 
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         <Card className="p-6 md:col-span-2">
+          <h2 className="text-[12px] font-medium uppercase tracking-wide text-text-tertiary">
+            Eat today
+          </h2>
+          {todayMeals ? (
+            <div className="mt-3">
+              <div className="flex flex-wrap gap-1.5">
+                {todayMeals.map((m) => (
+                  <Tag key={m.name}>{m.name}</Tag>
+                ))}
+              </div>
+              <p className="mt-3 text-[13px] text-text-secondary">
+                {nutritionPlan?.targetCalories} cal target today
+              </p>
+              <Link
+                href="/nutrition"
+                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-navy-hi underline underline-offset-4"
+              >
+                <IconNutrition width={14} height={14} /> View today&rsquo;s meals
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-3">
+              <p className="text-[13px] leading-relaxed text-text-secondary">
+                Generate a week of nutrition guidance built around your goal.
+              </p>
+              <Link href="/nutrition">
+                <PrimaryButton className="mt-4 w-full">Generate guidance</PrimaryButton>
+              </Link>
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-6">
           <h2 className="text-[12px] font-medium uppercase tracking-wide text-text-tertiary">Water</h2>
           <div className="mt-3">
             <WaterTracker

@@ -113,6 +113,18 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+export interface NutritionMeal {
+  name: string;
+  description: string;
+  calories: number;
+  items: string[];
+}
+
+export interface NutritionDay {
+  day: string; // "Monday", "Tuesday", ...
+  meals: NutritionMeal[];
+}
+
 export interface NutritionPlan {
   id: string;
   createdAt: string;
@@ -120,7 +132,7 @@ export interface NutritionPlan {
   maintenanceCalories: number;
   calorieStrategy: "deficit" | "surplus" | "maintenance";
   macros: { protein: number; carbs: number; fat: number };
-  meals: { name: string; description: string; calories: number; items: string[] }[];
+  days: NutritionDay[];
   notes: string;
 }
 
