@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 
 export function PrimaryButton({
   children,
@@ -73,9 +73,15 @@ export function ChoiceCard({
   );
 }
 
-export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className = "",
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-border-subtle bg-surface-1 ${className}`}>{children}</div>
+    <div className={`rounded-2xl border border-border-subtle bg-surface-1 ${className}`} {...rest}>
+      {children}
+    </div>
   );
 }
 
