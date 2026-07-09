@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root,
+.light {
+  color-scheme: light;
+
+  --surface-0: #f7f7f5; /* paper */
+  --surface-1: #ffffff;
+  --surface-2: #efeee9;
+  --surface-inverse: #0b0b0d; /* ink */
+
+  --text-primary: #0b0b0d;
+  --text-secondary: #4a4a4d;
+  --text-tertiary: #7b7b7e;
+  --text-inverse: #f7f7f5;
+
+  --border-subtle: #dedcd5;
+  --border-strong: #b9b7ae;
+
+  --navy: #111a3a;
+  --navy-hi: #2a3fa0;
+  --navy-contrast: #f7f7f5;
+
+  --shadow-color: 11 11 13;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --surface-0: #0b0b0d; /* ink */
+  --surface-1: #131316;
+  --surface-2: #1c1c20;
+  --surface-inverse: #f7f7f5;
+
+  --text-primary: #f2f2ef;
+  --text-secondary: #b3b3b0;
+  --text-tertiary: #83837f;
+  --text-inverse: #0b0b0d;
+
+  --border-subtle: #2a2a2e;
+  --border-strong: #3c3c41;
+
+  --navy: #2a3fa0;
+  --navy-hi: #4257c4;
+  --navy-contrast: #f7f7f5;
+
+  --shadow-color: 0 0 0;
+}
+
+@theme inline {
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-public-sans);
+
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-inverse: var(--surface-inverse);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-navy: var(--navy);
+  --color-navy-hi: var(--navy-hi);
+  --color-navy-contrast: var(--navy-contrast);
+
+  --color-strong: #3fb984;
+  --color-solid: #2a3fa0;
+  --color-developing: #e0a33e;
+
+  --color-ink: #0b0b0d;
+  --color-paper: #f7f7f5;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+h1, h2, h3, h4,
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--navy);
+  color: var(--navy-contrast);
+}
+
+:focus-visible {
+  outline: 2px solid var(--navy-hi);
+  outline-offset: 2px;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* thin custom scrollbar for chat panes */
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
