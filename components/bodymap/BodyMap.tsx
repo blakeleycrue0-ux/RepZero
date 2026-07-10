@@ -59,43 +59,46 @@ export function BodyMapFront({
 }) {
   return (
     <svg viewBox="0 0 240 460" className="h-auto w-full max-w-[260px]" role="img" aria-label="Front body map">
-      {/* head + neck outline */}
-      <circle cx="120" cy="36" r="24" fill="none" stroke="var(--border-subtle)" strokeWidth={1.2} />
-      <OutlinePart d="M108,58 L108,76 L132,76 L132,58" />
+      {/* head outline */}
+      <circle cx="120" cy="34" r="22" fill="none" stroke="var(--border-subtle)" strokeWidth={1.2} />
       {/* forearms/hands outline (not rated) */}
-      <OutlinePart d="M62,168 L52,250 L58,254 L70,172 Z" />
-      <OutlinePart d="M178,168 L188,250 L182,254 L170,172 Z" />
+      <OutlinePart d="M58,166 L46,252 L54,257 L68,170 Z" />
+      <OutlinePart d="M182,166 L194,252 L186,257 L172,170 Z" />
       {/* torso base outline */}
-      <OutlinePart d="M90,84 C78,92 72,110 72,130 L78,205 L162,205 L168,130 C168,110 162,92 150,84" />
+      <OutlinePart d="M88,82 C74,92 68,112 68,132 L75,207 L165,207 L172,132 C172,112 166,92 152,82" />
+
+      {/* traps/neck — colored with shoulders rating, closes the gap to a filled silhouette */}
+      <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
+        d="M104,56 C104,64 110,72 120,72 C130,72 136,64 136,56 L133,82 C128,86 112,86 107,82 Z" />
 
       <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M90,84 C74,86 60,98 58,120 C58,132 66,138 76,136 L84,110 C84,98 86,90 90,84 Z" />
+        d="M88,82 C68,84 52,98 50,122 C50,136 60,143 72,140 L82,108 C82,96 84,88 88,82 Z" />
       <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M150,84 C166,86 180,98 182,120 C182,132 174,138 164,136 L156,110 C156,98 154,90 150,84 Z" />
+        d="M152,82 C172,84 188,98 190,122 C190,136 180,143 168,140 L158,108 C158,96 156,88 152,82 Z" />
 
       <Region id="chest" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M92,96 C92,90 106,86 120,86 C134,86 148,90 148,96 L148,134 C136,142 104,142 92,134 Z" />
+        d="M90,94 C90,86 105,82 120,82 C135,82 150,86 150,94 L150,136 C137,146 103,146 90,136 Z" />
 
       <Region id="biceps" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M74,112 C68,116 62,140 62,166 L74,170 C78,146 82,126 86,114 Z" />
+        d="M70,110 C62,116 56,140 56,168 L70,173 C74,148 78,126 84,112 Z" />
       <Region id="biceps" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M166,112 C172,116 178,140 178,166 L166,170 C162,146 158,126 154,114 Z" />
+        d="M170,110 C178,116 184,140 184,168 L170,173 C166,148 162,126 156,112 Z" />
 
       <Region id="core" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M96,140 C108,146 132,146 144,140 L150,196 C132,206 108,206 90,196 Z" />
+        d="M94,140 C107,148 133,148 146,140 L152,198 C133,209 107,209 88,198 Z" />
 
       <Region id="quads" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M90,208 L84,296 C84,302 108,306 112,298 L114,208 Z" />
+        d="M86,210 L78,298 C78,306 106,310 111,300 L114,210 Z" />
       <Region id="quads" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M150,208 L156,296 C156,302 132,306 128,298 L126,208 Z" />
+        d="M154,210 L162,298 C162,306 134,310 129,300 L126,210 Z" />
 
       <Region id="calves" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M86,312 C84,332 84,356 88,374 L106,374 C108,356 106,332 104,312 Z" />
+        d="M82,314 C79,336 79,360 84,378 L106,378 C109,360 107,336 105,314 Z" />
       <Region id="calves" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M154,312 C156,332 156,356 152,374 L134,374 C132,356 134,332 136,312 Z" />
+        d="M158,314 C161,336 161,360 156,378 L134,378 C131,360 133,336 135,314 Z" />
 
-      <OutlinePart d="M88,378 L86,392 L108,392 L106,378" />
-      <OutlinePart d="M152,378 L154,392 L132,392 L134,378" />
+      <OutlinePart d="M84,382 L82,396 L108,396 L106,382" />
+      <OutlinePart d="M156,382 L158,396 L132,396 L134,382" />
     </svg>
   );
 }
@@ -111,39 +114,41 @@ export function BodyMapBack({
 }) {
   return (
     <svg viewBox="0 0 240 460" className="h-auto w-full max-w-[260px]" role="img" aria-label="Back body map">
-      <circle cx="120" cy="36" r="24" fill="none" stroke="var(--border-subtle)" strokeWidth={1.2} />
-      <OutlinePart d="M108,58 L108,76 L132,76 L132,58" />
-      <OutlinePart d="M62,168 L52,250 L58,254 L70,172 Z" />
-      <OutlinePart d="M178,168 L188,250 L182,254 L170,172 Z" />
+      <circle cx="120" cy="34" r="22" fill="none" stroke="var(--border-subtle)" strokeWidth={1.2} />
+      <OutlinePart d="M58,166 L46,252 L54,257 L68,170 Z" />
+      <OutlinePart d="M182,166 L194,252 L186,257 L172,170 Z" />
 
       <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M90,84 C74,86 60,98 58,120 C58,132 66,138 76,136 L84,110 C84,98 86,90 90,84 Z" />
+        d="M104,56 C104,64 110,72 120,72 C130,72 136,64 136,56 L133,82 C128,86 112,86 107,82 Z" />
+
       <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M150,84 C166,86 180,98 182,120 C182,132 174,138 164,136 L156,110 C156,98 154,90 150,84 Z" />
+        d="M88,82 C68,84 52,98 50,122 C50,136 60,143 72,140 L82,108 C82,96 84,88 88,82 Z" />
+      <Region id="shoulders" ratings={ratings} active={active ?? null} onSelect={onSelect}
+        d="M152,82 C172,84 188,98 190,122 C190,136 180,143 168,140 L158,108 C158,96 156,88 152,82 Z" />
 
       <Region id="back" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M92,88 C90,90 78,108 78,132 L84,196 C104,206 136,206 156,196 L162,132 C162,108 150,90 148,88 C136,96 104,96 92,88 Z" />
+        d="M90,86 C87,89 75,109 75,133 L82,199 C104,210 136,210 158,199 L165,133 C165,109 153,89 150,86 C137,95 103,95 90,86 Z" />
 
       <Region id="triceps" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M74,112 C68,116 62,140 62,166 L74,170 C78,146 82,126 86,114 Z" />
+        d="M70,110 C62,116 56,140 56,168 L70,173 C74,148 78,126 84,112 Z" />
       <Region id="triceps" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M166,112 C172,116 178,140 178,166 L166,170 C162,146 158,126 154,114 Z" />
+        d="M170,110 C178,116 184,140 184,168 L170,173 C166,148 162,126 156,112 Z" />
 
       <Region id="glutes" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M86,208 C84,224 86,240 92,248 C104,254 136,254 148,248 C154,240 156,224 154,208 C132,216 108,216 86,208 Z" />
+        d="M82,211 C79,228 82,245 89,254 C102,261 138,261 151,254 C158,245 161,228 158,211 C134,220 106,220 82,211 Z" />
 
       <Region id="hamstrings" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M90,252 L84,300 C84,306 106,310 110,302 L110,254 Z" />
+        d="M86,255 L78,302 C78,310 105,314 110,304 L112,257 Z" />
       <Region id="hamstrings" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M150,252 L156,300 C156,306 134,310 130,302 L130,254 Z" />
+        d="M154,255 L162,302 C162,310 135,314 130,304 L128,257 Z" />
 
       <Region id="calves" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M86,312 C84,334 84,358 88,376 L106,376 C108,358 106,334 104,312 Z" />
+        d="M82,314 C79,336 79,360 84,378 L106,378 C109,360 107,336 105,314 Z" />
       <Region id="calves" ratings={ratings} active={active ?? null} onSelect={onSelect}
-        d="M154,312 C156,334 156,358 152,376 L134,376 C132,358 134,334 136,312 Z" />
+        d="M158,314 C161,336 161,360 156,378 L134,378 C131,360 133,336 135,314 Z" />
 
-      <OutlinePart d="M88,380 L86,394 L108,394 L106,380" />
-      <OutlinePart d="M152,380 L154,394 L132,394 L134,380" />
+      <OutlinePart d="M84,382 L82,396 L108,396 L106,382" />
+      <OutlinePart d="M156,382 L158,396 L132,396 L134,382" />
     </svg>
   );
 }

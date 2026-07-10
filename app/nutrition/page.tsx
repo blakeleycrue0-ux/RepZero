@@ -8,6 +8,7 @@ import { newId } from "@/lib/id";
 import { PrimaryButton, SecondaryButton, Spinner, Card, EmptyState, Tag } from "@/components/ui";
 import Chat from "@/components/Chat";
 import { WEEKDAY_NAMES } from "@/lib/schedule";
+import FoodPreferences from "./FoodPreferences";
 
 const SUGGESTIONS = [
   "Can I swap the breakfast for something quicker?",
@@ -98,6 +99,10 @@ export default function NutritionPage() {
         />
       </div>
     );
+  }
+
+  if (profile.foodLikes === undefined) {
+    return <FoodPreferences profile={profile} onDone={setProfile} />;
   }
 
   return (

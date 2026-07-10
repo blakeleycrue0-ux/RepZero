@@ -19,6 +19,10 @@ export interface Profile {
   allergies: string[];
   ageConfirmed: boolean;
   displayName?: string;
+  // Undefined = not asked yet (triggers the nutrition-preferences step).
+  // Empty array = asked, user has none.
+  foodLikes?: string[];
+  foodDislikes?: string[];
   createdAt: string;
   updatedAt: string;
 }

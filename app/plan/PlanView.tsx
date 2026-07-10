@@ -1,42 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import type { PlanExercise, WorkoutPlan } from "@/lib/store/types";
+import type { PlanDay, PlanExercise, Profile, WorkoutPlan } from "@/lib/store/types";
 import { MUSCLE_LABELS } from "@/lib/muscle-labels";
-import { Card, Tag, SecondaryButton } from "@/components/ui";
+import { Card, Tag, SecondaryButton, PrimaryButton, Spinner } from "@/components/ui";
 import { IconClose } from "@/components/icons";
 
 export default function PlanView({
   plan,
+  profile,
   onChange,
 }: {
   plan: WorkoutPlan;
+  profile: Profile;
   onChange: (plan: WorkoutPlan) => void;
 }) {
   const [openDay, setOpenDay] = useState<number>(0);
 
-  function updateDay(dayIdx: number, exercises: PlanExercise[]) {
-    const days = plan.days.map((d, i) => (i === dayIdx ? { ...d, exercises } : d));
+  function updateDay(dayIdx: number, patch: Partial<PlanDay>) {
+    const days = plan.days.map((d, i) => (i === dayIdx ? { ...d, ...patch } : d));
     onChange({ ...plan, days });
   }
 
   function updateExercise(dayIdx: number, exIdx: number, patch: Partial<PlanExercise>) {
     const day = plan.days[dayIdx];
     const exercises = day.exercises.map((e, i) => (i === exIdx ? { ...e, ...patch } : e));
-    updateDay(dayIdx, exercises);
+    updateDay(dayIdx, { exercises });
   }
 
   function removeExercise(dayIdx: number, exIdx: number) {
     const day = plan.days[dayIdx];
-    updateDay(dayIdx, day.exercises.filter((_, i) => i !== exIdx));
+    updateDay(dayIdx, { exercises: day.exercises.filter((_, i) => i !== exIdx) });
   }
 
   function addExercise(dayIdx: number) {
     const day = plan.days[dayIdx];
-    updateDay(dayIdx, [
-      ...day.exercises,
-      { name: "New exercise", sets: 3, reps: "8-10", rpe: "8", targets: day.focus.slice(0, 1) },
-    ]);
+    updateDay(dayIdx, {
+      exercises: [
+        ...day.exercises,
+        { name: "New exercise", sets: 3, reps: "8-10", rpe: "8", targets: day.focus.slice(0, 1) },
+      ],
+    });
   }
 
   return (
@@ -121,6 +125,12 @@ export default function PlanView({
                   <SecondaryButton onClick={() => addExercise(dayIdx)} className="mt-3 !px-4 !py-1.5 text-[13px]">
                     + Add exercise
                   </SecondaryButton>
+
+                  <AskAiToAdjust
+                    profile={profile}
+                    day={day}
+                    onApply={(patch) => updateDay(dayIdx, patch)}
+                  />
                 </div>
               )}
 
@@ -134,5 +144,71 @@ export default function PlanView({
         })}
       </div>
     </div>
+  );
+}
+
+function AskAiToAdjust({
+  profile,
+  day,
+  onApply,
+}: {
+  profile: Profile;
+  day: PlanDay;
+  onApply: (patch: Pick<PlanDay, "name" | "focus" | "exercises">) => void;
+}) {
+  const [instruction, setInstruction] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = instruction.trim();
+    if (!trimmed || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/plan/adjust-day", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ profile, day, instruction: trimmed }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? "Couldn't apply that change.");
+      }
+      const data = await res.json();
+      onApply({ name: data.name, focus: data.focus, exercises: data.exercises });
+      setInstruction("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-4 border-t border-border-subtle pt-4">
+      <label htmlFor={`ai-adjust-${day.day}`} className="block text-[12px] font-medium text-text-tertiary">
+        Ask AI to adjust this day
+      </label>
+      <div className="mt-2 flex gap-2">
+        <input
+          id={`ai-adjust-${day.day}`}
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          disabled={loading}
+          placeholder="e.g. swap bench press for dumbbells"
+          className="flex-1 rounded-lg border border-border-subtle bg-surface-0 px-3 py-2 text-[13px] outline-none focus:border-navy-hi disabled:opacity-60"
+        />
+        <PrimaryButton type="submit" disabled={loading || !instruction.trim()} className="!px-4 !py-2 text-[13px]">
+          {loading ? <Spinner className="text-current" /> : "Apply"}
+        </PrimaryButton>
+      </div>
+      {error && (
+        <p role="alert" className="mt-2 text-[12px] text-danger">
+          {error}
+        </p>
+      )}
+    </form>
   );
 }

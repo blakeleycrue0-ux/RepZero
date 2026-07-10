@@ -69,6 +69,8 @@ async function pullRemoteIntoLocal(userId: string) {
           allergies: profileRow.allergies ?? [],
           ageConfirmed: profileRow.age_confirmed,
           displayName: profileRow.display_name ?? undefined,
+          foodLikes: profileRow.food_likes ?? undefined,
+          foodDislikes: profileRow.food_dislikes ?? undefined,
           createdAt: profileRow.created_at,
           updatedAt: profileRow.updated_at,
         });
@@ -197,6 +199,8 @@ export class SyncedStore extends IndexedDbStore implements DataStore {
         allergies: profile.allergies,
         age_confirmed: profile.ageConfirmed,
         display_name: profile.displayName ?? null,
+        food_likes: profile.foodLikes ?? null,
+        food_dislikes: profile.foodDislikes ?? null,
         created_at: profile.createdAt,
         updated_at: profile.updatedAt,
       })
