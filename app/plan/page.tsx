@@ -185,7 +185,7 @@ export default function PlanPage() {
 
           <div className="mt-6">
             {tab === "plan" ? (
-              <PlanView plan={plan} onChange={persistPlan} />
+              <PlanView plan={plan} profile={profile} onChange={persistPlan} />
             ) : (
               <ScheduleView plan={plan} schedule={schedule} onChange={persistSchedule} />
             )}

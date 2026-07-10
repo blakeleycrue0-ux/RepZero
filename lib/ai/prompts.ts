@@ -33,9 +33,15 @@ Respond with ONLY valid JSON matching this exact shape, no prose before or after
     // ...one entry for each of: ${GROUP_LIST}
   ],
   "bodyComposition": { "estimate": "lean|moderate|higher", "note": "one factual, constructive sentence" },
-  "summary": "2-3 sentence encouraging overview of the overall physique and trajectory",
+  "summary": "5-7 sentences: a real, specific overview — not generic filler",
   "top_priorities": ["group_id", "group_id"]
 }
+
+"summary" must be substantive and specific to this physique, not boilerplate. Cover, in flowing prose (not a list):
+- What stands out as the physique's clearest strengths, and why (which groups, what it means for their goal).
+- What the two top-priority groups need specifically — the kind of training emphasis that would move them fastest (e.g. "back would benefit most from more horizontal pulling volume and mind-muscle focus on rows" rather than just "train back more").
+- How the muscle development read and the body composition read relate to their likely goal — e.g. if body composition is "higher" and several groups are "strong", say plainly that the muscle is there and a cut would reveal it, rather than repeating each fact in isolation.
+- One concrete, encouraging note on trajectory — what changes fastest with consistent training from here.
 
 "top_priorities" must contain exactly 2 group ids, chosen as the highest-leverage groups to train next (usually, but not always, the "developing" ones).`;
 
@@ -61,7 +67,45 @@ Rules:
 - Only program exercises that fit the stated equipment access.
 - Scale volume and exercise complexity to the stated experience level.
 - If priority muscle groups are given, give them modestly more volume (an extra exercise or set) without neglecting the rest of the body.
-- Keep exercise names conventional and unambiguous (e.g. "Dumbbell Romanian Deadlift", not slang).`;
+- Keep exercise names conventional and unambiguous (e.g. "Dumbbell Romanian Deadlift", not slang).
+
+DAY NAMING RULES — this matters, get it right:
+- Never use vague numbered labels like "Upper 1", "Upper 2", "Lower A/B". Every training day's "name" must say plainly what it trains.
+- For 5+ days/week: use a classic single-group split — "Chest", "Back", "Legs", "Shoulders", "Arms" (combine only when it genuinely makes sense, e.g. "Shoulders & Arms" for a 4-day week).
+- For 4 days/week: an upper/lower split is fine, but name each session by its actual emphasis, e.g. "Upper (Chest & Triceps)" and "Upper (Back & Biceps)" — never two sessions with the identical name.
+- For 3 days/week: "Push", "Pull", "Legs" (classic PPL) reads clearly — use it.
+- For 1-2 days/week: "Full Body" sessions, varying the emphasis slightly session to session if there are two.
+- Every "name" in the plan must be unique — a user should never see the same day name twice and wonder what's different about them.`;
+}
+
+export function adjustDaySystem(): string {
+  return `You are an expert strength coach making a targeted edit to ONE day of an existing weekly workout plan, per the user's request. Respond with ONLY valid JSON, no prose, no markdown fences, matching exactly this shape:
+{
+  "name": "Push",
+  "focus": ["chest", "shoulders", "triceps"],
+  "exercises": [
+    { "name": "Barbell Bench Press", "sets": 4, "reps": "6-8", "rpe": "8", "targets": ["chest", "triceps"], "notes": "optional short cue" }
+  ]
+}
+Rules:
+- "focus" and exercise "targets" must only use these ids: ${GROUP_LIST}.
+- Apply ONLY the change the user asked for (e.g. swap one exercise, add/remove one movement, adjust volume). Do not rewrite the whole day or change exercises the user didn't ask about unless the request clearly requires it (e.g. "make this day easier" can touch several).
+- Keep the day's overall training purpose intact unless the user explicitly asks to change the focus/split — the "name" should still reflect what the day trains.
+- Only program exercises that fit the stated equipment access.
+- Keep exercise names conventional and unambiguous (e.g. "Dumbbell Romanian Deadlift", not slang).
+- If the user's request is unsafe, nonsensical, or impossible to apply cleanly (e.g. asks to remove every exercise, or names a movement outside stated equipment), make the smallest sensible adjustment instead of ignoring the request outright — never return an empty exercises list.
+- Never invent exercises targeting muscle groups nowhere in the original day or the user's request without reason.`;
+}
+
+export function adjustDayUserPrompt(
+  profile: Profile,
+  day: { day: string; name: string; focus: string[]; exercises: unknown[] },
+  instruction: string
+): string {
+  return `Profile — goal: ${profile.goal}, experience: ${profile.experience}, equipment: ${profile.equipment}.
+Current day (${day.day}): ${JSON.stringify({ name: day.name, focus: day.focus, exercises: day.exercises })}
+User's requested change: "${instruction}"
+Return the full updated day (name, focus, exercises) with the change applied.`;
 }
 
 export function planUserPrompt(profile: Profile, priorities: string[] | null, regenerateNote?: string): string {
@@ -139,7 +183,9 @@ export function nutritionUserPrompt(profile: Profile): string {
   return `Goal: ${profile.goal}
 Experience/activity level: ${profile.experience}, training ${profile.daysPerWeek} days/week
 Dietary pattern: ${profile.dietPattern}
-Allergies/avoid: ${profile.allergies.length ? profile.allergies.join(", ") : "none"}
+Allergies/avoid (hard constraint, never include): ${profile.allergies.length ? profile.allergies.join(", ") : "none"}
+Foods they like / eat often (lean on these where sensible): ${profile.foodLikes?.length ? profile.foodLikes.join(", ") : "no strong preferences given"}
+Foods they dislike (avoid unless there's truly no reasonable alternative): ${profile.foodDislikes?.length ? profile.foodDislikes.join(", ") : "none given"}
 Build a full 7-day week (Monday through Sunday) of balanced, varied meal guidance aligned to this, with the calorie target set per your instructions for this goal.`;
 }
 

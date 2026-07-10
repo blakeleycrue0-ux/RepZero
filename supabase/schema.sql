@@ -13,9 +13,16 @@ create table if not exists profiles (
   allergies text[] not null default '{}',
   age_confirmed boolean not null default false,
   display_name text,
+  food_likes text[],
+  food_dislikes text[],
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Safe to re-run: adds the columns above if this table already existed
+-- from an earlier version of this schema.
+alter table profiles add column if not exists food_likes text[];
+alter table profiles add column if not exists food_dislikes text[];
 
 create table if not exists scans (
   id uuid primary key,
@@ -104,6 +111,7 @@ begin
     'habit_logs', 'water_logs', 'nutrition_plans', 'chat_threads'
   ])
   loop
+    execute format('drop policy if exists "own rows only" on %I;', t);
     execute format(
       'create policy "own rows only" on %I for all using (auth.uid() = user_id) with check (auth.uid() = user_id);',
       t
